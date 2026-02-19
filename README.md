@@ -2,7 +2,7 @@
 
 **Open source offensive security suite for testing content and supply chain attacks against AI agents.**
 
-A flock of canaries — each tool generates payloads, deploys them into AI agent pipelines, and tracks whether they execute. Covers indirect prompt injection, coding assistant context poisoning, and RAG retrieval poisoning. Proof-of-execution via out-of-band callback, not output analysis.
+A flock of birds — sentinel tools (canaries) that detect agent compromise via out-of-band callback, and ecological attack tools that simulate invasive behaviors in AI knowledge systems. Covers indirect prompt injection, coding assistant context poisoning, and RAG retrieval poisoning.
 
 > Research program by [Richard Spicer](https://richardspicer.io) · [GitHub](https://github.com/richardspicer)
 
@@ -17,8 +17,8 @@ The program produces three tools in phases, each targeting a different content-b
 | Tool | Phase | Focus | Status |
 |------|-------|-------|--------|
 | [**IPI-Canary**](https://github.com/richardspicer/IPI-Canary) | 1 | Indirect prompt injection via document ingestion — proof-of-execution callback tracking | 🟡 Pre-release |
-| **CodeAgent-Canary** | 1.5 | Coding assistant context file poisoning — test whether project instruction files cause vulnerable code generation | 📋 Planned |
-| **Embed-Ject** | 2.5 | RAG retrieval poisoning optimizer — generate documents that win vector similarity battles to guarantee payload retrieval | 📋 Planned |
+| **CXP-Canary** | 1.5 | Coding assistant context poisoning — test whether project instruction files cause vulnerable code generation | 📋 Planned |
+| **Drongo** | 2.5 | RAG retrieval poisoning optimizer — generate documents that win vector similarity battles to guarantee payload retrieval | 📋 Planned |
 
 ---
 
@@ -45,7 +45,7 @@ ipi-canary status
 
 ---
 
-## Phase 1.5: Coding Assistant Context Poisoning — `CodeAgent-Canary` (Planned)
+## Phase 1.5: Coding Assistant Context Poisoning — `CXP-Canary` (Planned)
 
 Tests whether poisoned project-level instruction files (CLAUDE.md, AGENTS.md, .cursorrules, copilot-instructions.md, .windsurfrules, .gemini/settings.json) cause AI coding assistants to produce vulnerable code, exfiltrate data, or execute commands.
 
@@ -58,16 +58,16 @@ Completely unoccupied niche — academic research catalogs 42+ attack techniques
 
 ---
 
-## Phase 2.5: RAG Retrieval Poisoning Optimizer — `Embed-Ject` (Planned)
+## Phase 2.5: RAG Retrieval Poisoning Optimizer — `Drongo` (Planned)
 
-Solves the retrieval prerequisite that IPI-Canary assumes: how to guarantee poisoned content actually gets retrieved into the LLM's context window. Generates documents optimized to win vector similarity battles in RAG systems.
+Solves the retrieval prerequisite that IPI-Canary assumes: how to guarantee poisoned content actually gets retrieved into the LLM's context window. Named after the fork-tailed drongo — an African bird that mimics alarm calls to manipulate other species' behavior and steal their food. Drongo generates documents optimized to win vector similarity battles in RAG systems.
 
 - Generate text optimized for high cosine similarity with likely user queries across common embedding models
 - Wrap optimized text + injection payload into document formats (PDF, DOCX, TXT, HTML)
 - Validate retrieval rank against test vector DB (ChromaDB)
 - Report retrieval success rates across embedding models
 
-Natural pairing with IPI-Canary: Embed-Ject optimizes for retrieval → IPI-Canary wraps with callback payloads → combined tool tests the full RAG attack chain.
+Natural pairing with IPI-Canary: Drongo optimizes for retrieval → IPI-Canary wraps with callback payloads → combined tool tests the full RAG attack chain.
 
 ---
 
@@ -86,14 +86,21 @@ This is what separates Volery from output analysis tools. A callback proves the 
 
 ## Framework Mapping
 
-All findings map to established frameworks:
+Each tool maps to established AI security frameworks:
 
-| Framework | Usage |
-|-----------|-------|
-| OWASP Top 10 for LLM Applications 2025 | Primary vulnerability taxonomy |
-| OWASP Top 10 for Agentic AI | Attack pattern classification |
-| MITRE ATLAS | Adversarial ML technique mapping |
-| NIST AI RMF | Risk management context |
+| Tool | OWASP LLM Top 10 (2025) | OWASP Agentic Top 10 (2026) | MITRE ATLAS |
+|------|--------------------------|----------------------------|-------------|
+| **IPI-Canary** | LLM01: Prompt Injection | ASI-01: Agent Goal Hijacking | AML.T0051: LLM Prompt Injection |
+| **CXP-Canary** | LLM01: Prompt Injection, LLM03: Supply Chain | ASI-01: Agent Goal Hijacking, ASI-03: Tool Misuse | AML.T0051: LLM Prompt Injection |
+| **Drongo** | LLM08: Vector & Embedding Weaknesses | ASI-07: Knowledge Poisoning | AML.T0020: Poison Training Data |
+
+**LLM01 (Prompt Injection)** — IPI-Canary and CXP-Canary both exploit indirect prompt injection through different delivery vectors (documents vs context files).
+
+**LLM08 (Vector & Embedding Weaknesses)** — Added in the 2025 revision specifically for RAG poisoning. Drongo targets this directly by optimizing content for retrieval ranking manipulation.
+
+**ASI-01 (Agent Goal Hijacking)** — All three tools ultimately aim to hijack agent behavior via content ingestion.
+
+**ASI-07 (Knowledge Poisoning)** — Drongo's primary target: corrupting the knowledge base the agent retrieves from.
 
 ---
 
@@ -111,7 +118,7 @@ All Volery tools are released under [MIT](https://opensource.org/licenses/MIT).
 |----------|---------|
 | [Roadmap](Roadmap.md) | Phased development plan, tool descriptions, success metrics |
 | [Architecture](Architecture.md) | Program-level architecture notes and cross-tool integration points |
-| [concepts/](concepts/) | Concept docs for planned tools (CodeAgent-Canary, Embed-Ject) |
+| [concepts/](concepts/) | Concept docs for planned tools (CXP-Canary, Drongo) |
 
 ## AI Disclosure
 
