@@ -7,8 +7,8 @@ Program-level architecture notes for Volery. Individual tool architectures live 
 richardspicer/
 ├── volery/                         Program docs & roadmap
 │   ├── concepts/
-│   │   ├── codeagent-canary.md     Concept doc: coding assistant context poisoning
-│   │   ├── embed-ject.md           Concept doc: RAG retrieval poisoning optimizer
+│   │   ├── CXP-Canary.md     Concept doc: coding assistant context poisoning
+│   │   ├── Drongo.md           Concept doc: RAG retrieval poisoning optimizer
 │   │   └── TEMPLATE.md             Concept doc template
 │   ├── README.md
 │   ├── Roadmap.md
@@ -20,9 +20,9 @@ richardspicer/
 │   │   └── Roadmap.md              IPI-Canary development phases
 │   └── ...
 │
-├── codeagent-canary/               Phase 1.5: Coding assistant context poisoning (planned)
+├── CXP-Canary/               Phase 1.5: Coding assistant context poisoning (planned)
 │
-└── embed-ject/                     Phase 2.5: RAG retrieval poisoning optimizer (planned, may be IPI-Canary module)
+└── Drongo/                     Phase 2.5: RAG retrieval poisoning optimizer (planned, may be IPI-Canary module)
 ```
 
 Each tool repo owns its own Architecture.md and Roadmap.md. This document covers cross-tool integration points and shared patterns.
@@ -50,22 +50,22 @@ The callback-based verification is what differentiates Volery from output analys
 ---
 ## Cross-Tool Integration Points
 
-### Embed-Ject → IPI-Canary (Phase 2.5)
+### Drongo → IPI-Canary (Phase 2.5)
 
-The primary cross-tool integration. Embed-Ject optimizes text for vector retrieval; IPI-Canary wraps it with callback payloads.
+The primary cross-tool integration. Drongo optimizes text for vector retrieval; IPI-Canary wraps it with callback payloads.
 
 ```mermaid
 flowchart LR
-    EJ[Embed-Ject] -->|retrieval-optimized text| IPC[IPI-Canary]
+    EJ[Drongo] -->|retrieval-optimized text| IPC[IPI-Canary]
     IPC -->|payload documents| RAG[Target RAG System]
     RAG -->|callback| Listener[Callback Server]
 ```
 
-**Integration decision deferred:** Embed-Ject may be a standalone repo with shared payload format, or a module within IPI-Canary. The choice depends on whether Embed-Ject has standalone research value beyond IPI-Canary integration.
+**Integration decision deferred:** Drongo may be a standalone repo with shared payload format, or a module within IPI-Canary. The choice depends on whether Drongo has standalone research value beyond IPI-Canary integration.
 
 ### Shared Payload Format (Planned)
 
-When Embed-Ject development begins, define a shared format for passing retrieval-optimized text to IPI-Canary's generator pipeline. Candidates: JSON payload manifest, shared Python data model, or CLI piping.
+When Drongo development begins, define a shared format for passing retrieval-optimized text to IPI-Canary's generator pipeline. Candidates: JSON payload manifest, shared Python data model, or CLI piping.
 
 ---
 ## Ecosystem Context
@@ -74,7 +74,7 @@ Volery handles **content & supply chain** attacks. The **CounterAgent** program 
 
 | Program | Attack Surface | Tools |
 |---------|---------------|-------|
-| **Volery** | Document ingestion, context files, vector retrieval | IPI-Canary, CodeAgent-Canary, Embed-Ject |
+| **Volery** | Document ingestion, context files, vector retrieval | IPI-Canary, CXP-Canary, Drongo |
 | **CounterAgent** | MCP servers, tool trust, agent delegation | mcp-audit, mcp-proxy, agent-inject, agent-chain |
 
 The programs are complementary. Volery tests what happens when agents ingest malicious *content*. CounterAgent tests what happens when agents interact with malicious *infrastructure*. Findings from both feed into detection engineering (Wazuh/Sigma rules) and richardspicer.io publications.
@@ -92,7 +92,7 @@ The programs are complementary. Volery tests what happens when agents ingest mal
 | Git Hooks | Pre-commit | Enforced quality gates |
 | Testing | pytest | Standard Python testing |
 
-Individual tools may add stack-specific dependencies (e.g., sentence-transformers for Embed-Ject, browser automation for CodeAgent-Canary).
+Individual tools may add stack-specific dependencies (e.g., sentence-transformers for Drongo, browser automation for CXP-Canary).
 
 ---
 

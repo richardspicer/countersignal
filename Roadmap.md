@@ -57,10 +57,10 @@ Three tools targeting three content-based attack surfaces: document ingestion �
 **Planned:** "Reasoning Doesn't Protect Against Prompt Injection" — multi-model evidence across providers
 
 ---
-## Phase 1.5: Coding Assistant Context Poisoning — `CodeAgent-Canary`
+## Phase 1.5: Coding Assistant Context Poisoning — `CXP-Canary`
 
 ### Concept
-AI coding assistants treat project-level instruction files as trusted context. These files live in repositories that may be forked, cloned from untrusted sources, or contributed to by external parties. CodeAgent-Canary tests whether poisoned instruction files cause coding assistants to produce vulnerable code, exfiltrate data, or execute commands.
+AI coding assistants treat project-level instruction files as trusted context. These files live in repositories that may be forked, cloned from untrusted sources, or contributed to by external parties. CXP-Canary tests whether poisoned instruction files cause coding assistants to produce vulnerable code, exfiltrate data, or execute commands.
 
 ### Target Files
 - `CLAUDE.md` — Claude Code
@@ -94,10 +94,10 @@ AI coding assistants treat project-level instruction files as trusted context. T
 **Target:** Bounty submissions + richardspicer.io
 
 ---
-## Phase 2.5: RAG Retrieval Poisoning Optimizer — `Embed-Ject`
+## Phase 2.5: RAG Retrieval Poisoning Optimizer — `Drongo`
 
 ### Concept
-IPI-Canary tests whether injected content triggers when retrieved. It assumes the payload is already in the LLM's context window. Embed-Ject solves the prerequisite: how to guarantee that poisoned content wins the vector similarity battle and actually gets retrieved. This is the missing first half of the RAG attack chain.
+IPI-Canary tests whether injected content triggers when retrieved. It assumes the payload is already in the LLM's context window. Drongo solves the prerequisite: how to guarantee that poisoned content wins the vector similarity battle and actually gets retrieved. Named after the fork-tailed drongo — an African bird that mimics alarm calls to manipulate other species into abandoning their food — the tool manipulates retrieval trust signals so poisoned content gets served as legitimate. This is the missing first half of the RAG attack chain.
 
 ### Core Capabilities
 - Given a target query domain (e.g., "HR policy," "quarterly report"), generate text optimized for high cosine similarity with likely user queries across common embedding models
@@ -108,11 +108,11 @@ IPI-Canary tests whether injected content triggers when retrieved. It assumes th
 
 ### Integration with IPI-Canary
 Natural pairing forming the full RAG attack chain:
-1. Embed-Ject generates retrieval-optimized text for the target domain
+1. Drongo generates retrieval-optimized text for the target domain
 2. IPI-Canary wraps it with callback payloads using chosen hiding techniques
 3. Combined documents test whether the RAG system retrieves AND executes
 
-Integration could be: Embed-Ject as a module within IPI-Canary, or separate repo with shared payload format. Decision deferred until development begins.
+Integration could be: Drongo as a module within IPI-Canary, or separate repo with shared payload format. Decision deferred until development begins.
 
 ### Deliverables
 - Retrieval-optimized poison documents
@@ -189,15 +189,15 @@ Integration could be: Embed-Ject as a module within IPI-Canary, or separate repo
 - ✅ Published finding: parser regression
 - Pending: pre-release security review, multi-platform testing
 
-### Phase 1.5 Success (CodeAgent-Canary)
+### Phase 1.5 Success (CXP-Canary)
 - Poisoned context files cause at least one major coding assistant to produce vulnerable code
 - Comparison matrix covers 3+ assistants
 - At least one bounty submission from findings
 - Detection rules for context file poisoning patterns
 
-### Phase 2.5 Success (Embed-Ject)
+### Phase 2.5 Success (Drongo)
 - Generated documents achieve top-3 retrieval rank against target queries
-- Combined Embed-Ject + IPI-Canary pipeline produces confirmed callbacks
+- Combined Drongo + IPI-Canary pipeline produces confirmed callbacks
 - Retrieval success validated across 3+ embedding models
 
 ### Portfolio Success
@@ -215,11 +215,11 @@ Phase 1 (Active)
   └── Pre-release security review pending
 
 Phase 1.5 (Next)
-  CodeAgent-Canary ── coding assistant context poisoning
+  CXP-Canary ── coding assistant context poisoning
   └── Novel attack surface, immediate bounty value
 
 Phase 2.5 (After IPI-Canary stabilizes)
-  Embed-Ject ── RAG retrieval optimization
+  Drongo ── RAG retrieval optimization
   └── IPI-Canary companion, completes the RAG attack chain
 ```
 
