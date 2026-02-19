@@ -80,6 +80,26 @@ Volery handles **content & supply chain** attacks. The **CounterAgent** program 
 The programs are complementary. Volery tests what happens when agents ingest malicious *content*. CounterAgent tests what happens when agents interact with malicious *infrastructure*. Findings from both feed into detection engineering (Wazuh/Sigma rules) and richardspicer.io publications.
 
 ---
+## Framework Mapping
+
+Each Volery tool maps to established AI security frameworks. This grounds findings in shared taxonomy for conference submissions, blog posts, and responsible disclosure.
+
+| Tool | OWASP LLM Top 10 (2025) | OWASP Agentic Top 10 (2026) | MITRE ATLAS |
+|------|--------------------------|----------------------------|-------------|
+| **IPI-Canary** | LLM01: Prompt Injection | ASI-01: Agent Goal Hijacking | AML.T0051: LLM Prompt Injection |
+| **CXP-Canary** | LLM01: Prompt Injection, LLM03: Supply Chain | ASI-01: Agent Goal Hijacking, ASI-03: Tool Misuse | AML.T0051: LLM Prompt Injection |
+| **Drongo** | LLM08: Vector & Embedding Weaknesses | ASI-07: Knowledge Poisoning | AML.T0020: Poison Training Data |
+
+### Mapping rationale
+
+- **LLM01 (Prompt Injection):** IPI-Canary and CXP-Canary exploit indirect prompt injection through different delivery vectors — document ingestion (IPI-Canary) and project-level instruction files (CXP-Canary). Both inject attacker instructions via content the agent trusts.
+- **LLM03 (Supply Chain):** CXP-Canary also touches supply chain risk — poisoned context files can propagate through cloned repos, open-source dependencies, and shared templates.
+- **LLM08 (Vector & Embedding Weaknesses):** Added in the 2025 revision for RAG-specific attacks. Drongo directly targets this by optimizing content for retrieval ranking manipulation.
+- **ASI-01 (Agent Goal Hijacking):** All three tools ultimately aim to redirect agent behavior via content the agent consumes.
+- **ASI-03 (Tool Misuse):** CXP-Canary payloads can cause coding assistants to misuse their tool access (shell, file writes, API calls).
+- **ASI-07 (Knowledge Poisoning):** Drongo's primary target — corrupting the retrieval knowledge base so the agent serves attacker-controlled content.
+
+---
 ## Technology Stack (Shared Defaults)
 
 | Component | Choice | Rationale |

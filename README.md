@@ -86,14 +86,21 @@ This is what separates Volery from output analysis tools. A callback proves the 
 
 ## Framework Mapping
 
-All findings map to established frameworks:
+Each tool maps to established AI security frameworks:
 
-| Framework | Usage |
-|-----------|-------|
-| OWASP Top 10 for LLM Applications 2025 | Primary vulnerability taxonomy |
-| OWASP Top 10 for Agentic AI | Attack pattern classification |
-| MITRE ATLAS | Adversarial ML technique mapping |
-| NIST AI RMF | Risk management context |
+| Tool | OWASP LLM Top 10 (2025) | OWASP Agentic Top 10 (2026) | MITRE ATLAS |
+|------|--------------------------|----------------------------|-------------|
+| **IPI-Canary** | LLM01: Prompt Injection | ASI-01: Agent Goal Hijacking | AML.T0051: LLM Prompt Injection |
+| **CXP-Canary** | LLM01: Prompt Injection, LLM03: Supply Chain | ASI-01: Agent Goal Hijacking, ASI-03: Tool Misuse | AML.T0051: LLM Prompt Injection |
+| **Drongo** | LLM08: Vector & Embedding Weaknesses | ASI-07: Knowledge Poisoning | AML.T0020: Poison Training Data |
+
+**LLM01 (Prompt Injection)** — IPI-Canary and CXP-Canary both exploit indirect prompt injection through different delivery vectors (documents vs context files).
+
+**LLM08 (Vector & Embedding Weaknesses)** — Added in the 2025 revision specifically for RAG poisoning. Drongo targets this directly by optimizing content for retrieval ranking manipulation.
+
+**ASI-01 (Agent Goal Hijacking)** — All three tools ultimately aim to hijack agent behavior via content ingestion.
+
+**ASI-07 (Knowledge Poisoning)** — Drongo's primary target: corrupting the knowledge base the agent retrieves from.
 
 ---
 
