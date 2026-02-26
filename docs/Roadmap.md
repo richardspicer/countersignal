@@ -21,7 +21,7 @@ The **CounterAgent** program (mcp-audit, mcp-proxy, agent-inject, agent-chain) i
 Three tools targeting three content-based attack surfaces: document ingestion → coding assistant context → RAG retrieval optimization. All share the generate → deploy → track methodology with out-of-band callback verification.
 
 ---
-## Phase 1: Indirect Prompt Injection Detection (v1.0) — `IPI-Canary`
+## Phase 1: Indirect Prompt Injection Detection (v1.0) — IPI
 
 ### Scope
 - Generate documents with hidden payloads across multiple formats
@@ -57,10 +57,10 @@ Three tools targeting three content-based attack surfaces: document ingestion �
 **Planned:** "Reasoning Doesn't Protect Against Prompt Injection" — multi-model evidence across providers
 
 ---
-## Phase 1.5: Coding Assistant Context Poisoning — `CXP-Canary`
+## Phase 1.5: Coding Assistant Context Poisoning — CXP
 
 ### Concept
-AI coding assistants treat project-level instruction files as trusted context. These files live in repositories that may be forked, cloned from untrusted sources, or contributed to by external parties. CXP-Canary tests whether poisoned instruction files cause coding assistants to produce vulnerable code, exfiltrate data, or execute commands.
+AI coding assistants treat project-level instruction files as trusted context. These files live in repositories that may be forked, cloned from untrusted sources, or contributed to by external parties. CXP tests whether poisoned instruction files cause coding assistants to produce vulnerable code, exfiltrate data, or execute commands.
 
 ### Target Files
 - `CLAUDE.md` — Claude Code
@@ -94,10 +94,10 @@ AI coding assistants treat project-level instruction files as trusted context. T
 **Target:** Bounty submissions + richardspicer.io
 
 ---
-## Phase 2.5: RAG Retrieval Poisoning Optimizer — `Drongo`
+## Phase 2.5: RAG Retrieval Poisoning Optimizer — RXP
 
 ### Concept
-IPI-Canary tests whether injected content triggers when retrieved. It works well for controlled knowledge base testing where retrieval is guaranteed by the test setup. Drongo extends this to contested retrieval scenarios — where poisoned content sits alongside legitimate documents and must win the vector similarity battle to reach the LLM's context window. Named after the fork-tailed drongo — an African bird that mimics alarm calls to manipulate other species into abandoning their food — the tool manipulates retrieval trust signals so poisoned content gets served as legitimate.
+IPI tests whether injected content triggers when retrieved. It works well for controlled knowledge base testing where retrieval is guaranteed by the test setup. RXP (codename Drongo) extends this to contested retrieval scenarios — where poisoned content sits alongside legitimate documents and must win the vector similarity battle to reach the LLM's context window. Named after the fork-tailed drongo — an African bird that mimics alarm calls to manipulate other species into abandoning their food — the tool manipulates retrieval trust signals so poisoned content gets served as legitimate.
 
 ### Core Capabilities
 - Given a target query domain (e.g., "HR policy," "quarterly report"), generate text optimized for high cosine similarity with likely user queries across common embedding models
@@ -106,13 +106,13 @@ IPI-Canary tests whether injected content triggers when retrieved. It works well
 - Report retrieval success rates across embedding models
 - Generate embedding space similarity heatmaps
 
-### Integration with IPI-Canary
+### Integration with IPI
 Natural pairing forming the full RAG attack chain:
-1. Drongo generates retrieval-optimized text for the target domain
-2. IPI-Canary wraps it with callback payloads using chosen hiding techniques
+1. RXP generates retrieval-optimized text for the target domain
+2. IPI wraps it with callback payloads using chosen hiding techniques
 3. Combined documents test whether the RAG system retrieves AND executes
 
-Integration could be: Drongo as a module within IPI-Canary, or separate repo with shared payload format. Decision deferred until development begins.
+RXP and IPI are sibling modules in the countersignal monorepo with shared core infrastructure.
 
 ### Deliverables
 - Retrieval-optimized poison documents
@@ -182,7 +182,7 @@ Integration could be: Drongo as a module within IPI-Canary, or separate repo wit
 ---
 ## Success Metrics
 
-### Phase 1 Success (IPI-Canary)
+### Phase 1 Success (IPI)
 - ✅ 34 techniques across 7 formats with E2E testing
 - ✅ 12 confirmed real-world callbacks
 - ✅ Multi-model, multi-provider testing (18 models)
@@ -190,15 +190,15 @@ Integration could be: Drongo as a module within IPI-Canary, or separate repo wit
 - ✅ Pre-release security review complete (bandit, semgrep, pip-audit, manual review, dynamic testing)
 - Pending: multi-platform testing
 
-### Phase 1.5 Success (CXP-Canary)
+### Phase 1.5 Success (CXP)
 - Poisoned context files cause at least one major coding assistant to produce vulnerable code
 - Comparison matrix covers 3+ assistants
 - At least one bounty submission from findings
 - Detection rules for context file poisoning patterns
 
-### Phase 2.5 Success (Drongo)
+### Phase 2.5 Success (RXP)
 - Generated documents achieve top-3 retrieval rank against target queries
-- Combined Drongo + IPI-Canary pipeline produces confirmed callbacks
+- Combined RXP + IPI pipeline produces confirmed callbacks
 - Retrieval success validated across 3+ embedding models
 
 ### Portfolio Success
@@ -211,17 +211,14 @@ Integration could be: Drongo as a module within IPI-Canary, or separate repo wit
 ## Build Sequence
 
 ```
-Phase 1 (Active)
-  IPI-Canary ── indirect prompt injection detection
-  └── v0.1.0 released, multi-platform testing ongoing
-
-Phase 1.5 (Next)
-  CXP-Canary ── coding assistant context poisoning
-  └── Novel attack surface, immediate bounty value
-
-Phase 2.5 (After IPI-Canary stabilizes)
-  Drongo ── RAG retrieval optimization
-  └── IPI-Canary companion, completes the RAG attack chain
+countersignal (monorepo)
+├── core/     Shared callback infrastructure
+├── ipi/      Phase 1 — indirect prompt injection detection
+│             └── v0.1.0 released, multi-platform testing ongoing
+├── cxp/      Phase 1.5 — coding assistant context poisoning
+│             └── Migrated, bounty testing in progress
+└── rxp/      Phase 2.5 — RAG retrieval optimization (planned)
+              └── IPI companion, completes the RAG attack chain
 ```
 
 ---

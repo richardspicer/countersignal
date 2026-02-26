@@ -94,7 +94,7 @@ def record(
     model: Annotated[str, typer.Option(help="Underlying model name.")] = "",
     notes: Annotated[str, typer.Option(help="Researcher observations.")] = "",
     db_path: Annotated[
-        Path | None, typer.Option("--db", help="Database path (default: ./cxp-canary.db).")
+        Path | None, typer.Option("--db", help="Database path (default: ~/.countersignal/cxp.db).")
     ] = None,
 ) -> None:
     """Record a test result into the evidence store."""
@@ -159,7 +159,7 @@ def record(
 def campaigns(
     campaign_id: Annotated[str | None, typer.Argument()] = None,
     db_path: Annotated[
-        Path | None, typer.Option("--db", help="Database path (default: ./cxp-canary.db).")
+        Path | None, typer.Option("--db", help="Database path (default: ~/.countersignal/cxp.db).")
     ] = None,
 ) -> None:
     """List campaigns and results."""
@@ -230,7 +230,7 @@ def validate(
         list[Path] | None, typer.Option("--file", help="Path to file(s) to validate.")
     ] = None,
     db_path: Annotated[
-        Path | None, typer.Option("--db", help="Database path (default: ./cxp-canary.db).")
+        Path | None, typer.Option("--db", help="Database path (default: ~/.countersignal/cxp.db).")
     ] = None,
 ) -> None:
     """Validate captured output against detection rules."""
@@ -283,7 +283,7 @@ def matrix(
         Path | None, typer.Option("--output", help="Write to file instead of stdout.")
     ] = None,
     db_path: Annotated[
-        Path | None, typer.Option("--db", help="Database path (default: ./cxp-canary.db).")
+        Path | None, typer.Option("--db", help="Database path (default: ~/.countersignal/cxp.db).")
     ] = None,
 ) -> None:
     """Generate an assistant comparison matrix."""
@@ -318,7 +318,7 @@ def poc(
         typer.Option("--output", help="Output zip path (default: ./poc-{technique}.zip)."),
     ] = None,
     db_path: Annotated[
-        Path | None, typer.Option("--db", help="Database path (default: ./cxp-canary.db).")
+        Path | None, typer.Option("--db", help="Database path (default: ~/.countersignal/cxp.db).")
     ] = None,
 ) -> None:
     """Export a bounty-ready PoC package."""
