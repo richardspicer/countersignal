@@ -11,7 +11,7 @@ Typical usage:
     >>> retrieved = get_campaign(campaign.uuid)
 
 Database location:
-    Default: ~/.countersignal/canary.db
+    Default: ~/.countersignal/ipi.db
     Override: Pass db_path parameter to any function
 
 Schema:
@@ -28,8 +28,8 @@ from pathlib import Path
 
 from .models import Campaign, Hit, HitConfidence
 
-DEFAULT_DB_PATH = Path.home() / ".countersignal" / "canary.db"
-"""Default database file location (~/.countersignal/canary.db)."""
+DEFAULT_DB_PATH = Path.home() / ".countersignal" / "ipi.db"
+"""Default database file location (~/.countersignal/ipi.db)."""
 
 
 @contextmanager
@@ -45,7 +45,7 @@ def get_connection(db_path: Path = DEFAULT_DB_PATH) -> Generator[sqlite3.Connect
 
     Args:
         db_path: Path to the SQLite database file.
-            Defaults to DEFAULT_DB_PATH (~/.countersignal/canary.db).
+            Defaults to DEFAULT_DB_PATH (~/.countersignal/ipi.db).
 
     Yields:
         sqlite3.Connection: Active database connection.
