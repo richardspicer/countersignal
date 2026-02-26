@@ -10,7 +10,7 @@ from pathlib import Path
 
 from countersignal.cxp.models import Campaign, TestResult
 
-_DEFAULT_DB_PATH = Path("cxp-canary.db")
+_DEFAULT_DB_PATH = Path.home() / ".countersignal" / "cxp.db"
 
 _SCHEMA = """\
 CREATE TABLE IF NOT EXISTS campaigns (
@@ -42,12 +42,13 @@ def get_db(db_path: Path | None = None) -> sqlite3.Connection:
     """Open or create the evidence database.
 
     Args:
-        db_path: Path to the database file. Defaults to ./cxp-canary.db.
+        db_path: Path to the database file. Defaults to ~/.countersignal/cxp.db.
 
     Returns:
         An open SQLite connection with tables initialized.
     """
     path = db_path or _DEFAULT_DB_PATH
+    path.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(str(path))
     conn.execute("PRAGMA foreign_keys = ON")
     init_db(conn)
