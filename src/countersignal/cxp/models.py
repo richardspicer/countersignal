@@ -1,4 +1,4 @@
-"""Core data models for CXP-Canary."""
+"""Core data models for CounterSignal CXP."""
 
 from __future__ import annotations
 

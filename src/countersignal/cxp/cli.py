@@ -120,11 +120,11 @@ def record(
     if file_list:
         capture_mode = "file"
         captured_files = [str(f) for f in file_list]
-        raw_output = "\n".join(f.read_text() for f in file_list)
+        raw_output = "\n".join(f.read_text(encoding="utf-8", errors="replace") for f in file_list)
     else:
         capture_mode = "output"
         assert output_file is not None
-        raw_output = output_file.read_text()
+        raw_output = output_file.read_text(encoding="utf-8", errors="replace")
 
     # Open DB and resolve campaign
     conn = get_db(db_path)
@@ -262,7 +262,7 @@ def validate(
                 _error(f"Invalid value for '--file': Path '{f}' does not exist.")
         if get_technique(technique) is None:
             _error(f"Unknown technique: {technique}")
-        raw_output = "\n".join(f.read_text() for f in file_list)
+        raw_output = "\n".join(f.read_text(encoding="utf-8", errors="replace") for f in file_list)
         vr = run_validation(raw_output, technique)
 
     typer.echo(f"Verdict: {vr.verdict}")
