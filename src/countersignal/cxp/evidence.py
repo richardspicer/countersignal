@@ -127,7 +127,7 @@ def list_campaigns(conn: sqlite3.Connection) -> list[Campaign]:
     Returns:
         List of campaigns ordered by creation time descending.
     """
-    cursor = conn.execute("SELECT * FROM campaigns ORDER BY created DESC")
+    cursor = conn.execute("SELECT * FROM campaigns ORDER BY created DESC, rowid DESC")
     return [_row_to_campaign(row) for row in cursor.fetchall()]
 
 
