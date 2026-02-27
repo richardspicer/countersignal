@@ -125,6 +125,8 @@ uv sync --group dev
 ## Claude Code Guardrails
 
 ### Verification Scope
+- Run `uv run ruff check` and `uv run ruff format --check` on new/changed files before committing
+- Run `uv run mypy` on new/changed source files before committing
 - Run only the tests for new/changed code, not the full suite
 - Smoke test the CLI after changes (`countersignal --help`)
 - Full suite verification is the developer's responsibility before merging
@@ -144,6 +146,7 @@ uv sync --group dev
 - Do not create PRs. Push the branch and stop.
 - Do not attempt to install CLI tools (gh, hub, etc.)
 - Do not modify files in `concepts/` or `docs/` unless the task brief explicitly says to
+- Do not create implementation plan files, design docs, or any docs/plans/ directory in the repo. NEVER commit plan files. If subagent-driven development requires a plan file, write it to the OS temp directory (`/tmp` on Unix, `TMPDIR` or `TEMP` env var), not the repo. Plans are transient session artifacts, not project documentation.
 
 ## Session Discipline
 
