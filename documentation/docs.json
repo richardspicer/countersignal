@@ -1,0 +1,14 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "CounterSignal",
+  "colors": {
+    "primary": "#dc2626"
+  },
+  "navigation": [
+    {
+      "group": "Get Started",
+      "pages": ["introduction"]
+    }
+  ]
+}
