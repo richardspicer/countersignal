@@ -141,12 +141,10 @@ knowledge_base:
       instructions: >-
         MCP security vulnerability scanner. CounterAgent discovers
         vulnerabilities, CounterSignal generates payloads to test
-        them. Shared evidence models and OWASP mappings.
-    - repository: "q-uestionable-ai/mutual-dissent"
-      instructions: >-
-        Cross-vendor multi-model debate engine. RXP-poisoned documents
-        from CounterSignal feed into Mutual Dissent vector stores for
-        consensus poisoning research.
+        them. Shared evidence models and OWASP mappings. Also related
+        to mutual-dissent (cross-vendor debate engine) where
+        RXP-poisoned documents feed into vector stores for consensus
+        poisoning research.
 
 code_generation:
   docstrings:
