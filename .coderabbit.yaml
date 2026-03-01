@@ -1,0 +1,166 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: "en-US"
+early_access: true
+tone_instructions: >-
+  Concise, direct, security-aware. This generates adversarial payloads
+  for security research — flag anything that could cause uncontrolled
+  side effects, leak credentials, or produce non-reproducible results.
+  No fluff.
+
+reviews:
+  profile: "assertive"
+  high_level_summary: true
+  high_level_summary_in_walkthrough: true
+  poem: false
+  in_progress_fortune: false
+  sequence_diagrams: true
+  collapse_walkthrough: false
+  changed_files_summary: true
+  review_status: true
+  commit_status: true
+  assess_linked_issues: true
+  related_issues: true
+  related_prs: true
+  suggested_labels: true
+  suggested_reviewers: false
+  auto_apply_labels: false
+  enable_prompt_for_ai_agents: true
+
+  auto_review:
+    enabled: true
+    auto_incremental_review: true
+    drafts: false
+    ignore_title_keywords:
+      - "WIP"
+      - "DO NOT MERGE"
+
+  path_filters:
+    - "!**/__pycache__/**"
+    - "!**/.mypy_cache/**"
+    - "!**/.ruff_cache/**"
+    - "!**/.pytest_cache/**"
+    - "!**/uv.lock"
+
+  path_instructions:
+    - path: "src/countersignal/ipi/**"
+      instructions: >-
+        Indirect Prompt Injection (IPI) payload generator. Verify:
+        generated payloads are deterministic given same seed/config,
+        output includes metadata for OWASP categorization, no
+        payloads are executed during generation — generation and
+        execution are strictly separated. Check that the UI (Flask)
+        sanitizes all user input.
+    - path: "src/countersignal/cxp/**"
+      instructions: >-
+        Cross-context Poisoning (CXP) module. Verify: technique
+        implementations map correctly to objectives, evidence
+        collection captures full provenance chain, builder pattern
+        produces valid payloads. Check format handlers don't
+        execute content during parsing.
+    - path: "src/countersignal/cxp/techniques/**"
+      instructions: >-
+        Adversarial technique implementations. Each technique must:
+        document its OWASP mapping, be deterministic, produce
+        structured evidence, and include validation. Flag any
+        technique that makes network calls during payload generation.
+    - path: "src/countersignal/rxp/**"
+      instructions: >-
+        RAG Retrieval Poisoning (RXP) optimizer. Security-critical
+        integration point — poisoned documents feed into vector
+        stores. Verify: document provenance is tracked, poisoning
+        is reversible/cleanable, no uncontrolled writes to external
+        systems.
+    - path: "src/countersignal/core/**"
+      instructions: >-
+        Core models, evidence, and database. Verify: evidence models
+        are immutable after creation, database operations are
+        transactional, listener pattern doesn't leak state between
+        runs. Check cross-platform path handling (pathlib).
+    - path: "harness/**"
+      instructions: >-
+        Test harness for payload execution. Verify: harness is
+        isolated from production code, execution environment is
+        sandboxed, results are captured as structured evidence.
+    - path: "payloads/**"
+      instructions: >-
+        Generated payload storage. Verify: no real credentials or
+        PII in committed payloads, payloads include metadata headers,
+        file naming follows convention.
+    - path: "tests/**"
+      instructions: >-
+        Test suite. Verify: no real API calls or payload execution,
+        mock all external services. Check cross-platform compatibility.
+        Ensure no real credentials in test fixtures.
+    - path: ".github/workflows/**"
+      instructions: >-
+        CI/CD workflows. Check: secrets not exposed in logs, matrix
+        includes both ubuntu-latest and windows-latest, pinned action
+        versions use SHA not tags.
+
+  finishing_touches:
+    docstrings:
+      enabled: true
+    unit_tests:
+      enabled: true
+
+  tools:
+    ruff:
+      enabled: true
+    gitleaks:
+      enabled: true
+    trufflehog:
+      enabled: true
+    actionlint:
+      enabled: true
+    shellcheck:
+      enabled: true
+    yamllint:
+      enabled: true
+    markdownlint:
+      enabled: true
+    github-checks:
+      enabled: true
+      timeout_ms: 120000
+
+chat:
+  auto_reply: true
+
+knowledge_base:
+  code_guidelines:
+    enabled: true
+  learnings:
+    scope: "local"
+  issues:
+    scope: "local"
+  pull_requests:
+    scope: "local"
+  web_search:
+    enabled: true
+  linked_repositories:
+    - repository: "q-uestionable-ai/counteragent"
+      instructions: >-
+        MCP security vulnerability scanner. CounterAgent discovers
+        vulnerabilities, CounterSignal generates payloads to test
+        them. Shared evidence models and OWASP mappings.
+    - repository: "q-uestionable-ai/mutual-dissent"
+      instructions: >-
+        Cross-vendor multi-model debate engine. RXP-poisoned documents
+        from CounterSignal feed into Mutual Dissent vector stores for
+        consensus poisoning research.
+
+code_generation:
+  docstrings:
+    language: "en-US"
+    path_instructions:
+      - path: "**/*.py"
+        instructions: >-
+          Use Google-style docstrings. Include Args, Returns, and Raises
+          sections. Keep descriptions concise — one line for simple
+          functions, brief paragraph for complex ones.
+  unit_tests:
+    path_instructions:
+      - path: "src/**/*.py"
+        instructions: >-
+          Use pytest with pytest-asyncio for async tests. Mock all
+          external API calls and payload execution. Use fixtures from
+          conftest.py. Tests must pass on both Windows and Linux.
