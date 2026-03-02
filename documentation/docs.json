@@ -4,15 +4,94 @@
   "name": "CounterSignal",
   "colors": {
     "primary": "#06b6d4",
-    "light": "#06b6d4",
+    "light": "#0e7490",
     "dark": "#06b6d4"
+  },
+  "favicon": "/favicon.svg",
+  "topbarLinks": [
+    {
+      "name": "GitHub",
+      "url": "https://github.com/q-uestionable-AI/countersignal"
+    }
+  ],
+  "topbarCtaButton": {
+    "name": "Get Started",
+    "url": "/quickstart"
   },
   "navigation": {
     "groups": [
       {
-        "group": "Get Started",
-        "pages": ["introduction"]
+        "group": "Getting Started",
+        "pages": [
+          "introduction",
+          "quickstart",
+          "concepts"
+        ]
+      },
+      {
+        "group": "IPI — Indirect Prompt Injection",
+        "pages": [
+          "ipi/cli",
+          "ipi/techniques",
+          "ipi/formats",
+          "ipi/payloads",
+          "ipi/callbacks",
+          "ipi/dashboard"
+        ]
+      },
+      {
+        "group": "CXP — Context File Poisoning",
+        "pages": [
+          "cxp/cli",
+          "cxp/objectives",
+          "cxp/assistant-formats",
+          "cxp/validation"
+        ]
+      },
+      {
+        "group": "RXP — RAG Retrieval Poisoning",
+        "pages": [
+          "rxp/overview"
+        ]
+      },
+      {
+        "group": "Configuration",
+        "pages": [
+          "config/callback-server",
+          "config/dangerous-payloads",
+          "config/environment-variables"
+        ]
+      },
+      {
+        "group": "Architecture",
+        "pages": [
+          "architecture/overview",
+          "architecture/core",
+          "architecture/ipi-module",
+          "architecture/cxp-module"
+        ]
+      },
+      {
+        "group": "Research",
+        "pages": [
+          "research/methodology",
+          "research/findings",
+          "research/disclosure-policy"
+        ]
       }
     ]
+  },
+  "footer": {
+    "socials": {
+      "github": "https://github.com/q-uestionable-AI/countersignal",
+      "website": "https://richardspicer.io"
+    }
+  },
+  "metadata": {
+    "og:site_name": "CounterSignal Docs",
+    "og:description": "Offensive security payloads for AI system testing"
+  },
+  "search": {
+    "placeholder": "Search docs..."
   }
 }

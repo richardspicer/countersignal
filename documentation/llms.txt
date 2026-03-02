@@ -1,0 +1,30 @@
+# CounterSignal
+
+> Offensive security payloads for AI system testing
+
+## Docs
+
+- [Introduction](/introduction)
+- [Quickstart](/quickstart)
+- [Core Concepts](/concepts)
+- [IPI CLI Reference](/ipi/cli)
+- [Hiding Techniques](/ipi/techniques)
+- [Document Formats](/ipi/formats)
+- [Payload Styles & Types](/ipi/payloads)
+- [Callback Verification](/ipi/callbacks)
+- [Web Dashboard](/ipi/dashboard)
+- [CXP CLI Reference](/cxp/cli)
+- [Attack Objectives](/cxp/objectives)
+- [Assistant Formats](/cxp/assistant-formats)
+- [Output Validation](/cxp/validation)
+- [RXP Overview](/rxp/overview)
+- [Callback Server](/config/callback-server)
+- [Dangerous Payloads](/config/dangerous-payloads)
+- [Environment Variables](/config/environment-variables)
+- [Architecture Overview](/architecture/overview)
+- [Shared Core](/architecture/core)
+- [IPI Module](/architecture/ipi-module)
+- [CXP Module](/architecture/cxp-module)
+- [Research Methodology](/research/methodology)
+- [Published Findings](/research/findings)
+- [Disclosure Policy](/research/disclosure-policy)
