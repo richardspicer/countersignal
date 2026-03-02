@@ -41,26 +41,26 @@ src/countersignal/
 
 ```
 countersignal
-├── ipi          Indirect prompt injection via document ingestion
-│   ├── generate   Generate payload documents
-│   ├── listen     Start callback listener server
-│   ├── status     Show campaign status and hits
-│   ├── techniques List available hiding techniques
-│   ├── formats    List supported document formats
-│   ├── export     Export campaign data
-│   └── reset      Clear all campaigns and generated files
-├── cxp          Coding assistant context file poisoning
-│   ├── objectives List attack objectives
-│   ├── formats    List assistant format targets
-│   ├── techniques List technique matrix
-│   ├── generate   Generate poisoned test repositories
-│   ├── validate   Validate captured output against rules
-│   ├── record     Record test result into evidence store
-│   ├── campaigns  List campaigns and results
+├── ipi            # Indirect prompt injection via document ingestion
+│   ├── generate   # Generate payload documents
+│   ├── listen     # Start callback listener server
+│   ├── status     # Show campaign status and hits
+│   ├── techniques # List available hiding techniques
+│   ├── formats    # List supported document formats
+│   ├── export     # Export campaign data
+│   └── reset      # Clear all campaigns and generated files
+├── cxp            # Coding assistant context file poisoning
+│   ├── objectives # List attack objectives
+│   ├── formats    # List assistant format targets
+│   ├── techniques # List technique matrix
+│   ├── generate   # Generate poisoned test repositories
+│   ├── validate   # Validate captured output against rules
+│   ├── record     # Record test result into evidence store
+│   ├── campaigns  # List campaigns and results
 │   └── report
-│       ├── matrix Generate comparison matrix
-│       └── poc    Export bounty-ready PoC package
-└── rxp          RAG retrieval poisoning (planned)
+│       ├── matrix # Generate comparison matrix
+│       └── poc    # Export bounty-ready PoC package
+└── rxp            # RAG retrieval poisoning (planned)
 ```
 
 ## Core Module
@@ -152,13 +152,3 @@ Managed independently by the CXP module. Uses its own schema and dataclass model
 | `test_results` | Captured assistant outputs with technique, assistant, validation status |
 
 Both databases use `Path.home() / ".countersignal"` with automatic directory creation on first access.
-
-## Design Decisions
-
-See [Architecture-Decision.md](Architecture-Decision.md) for the full migration decision record, including:
-
-- **Single-package monorepo** over uv workspaces or separate repos
-- **Core boundary rule**: extract to `core/` only when 2+ modules need shared infrastructure
-- **CXP dataclasses kept separate** from core Pydantic models — forcing alignment during migration adds risk with no current benefit
-- **Typer standardization** — IPI already used Typer; CXP converted from Click during migration
-- **Copy-based migration** — import rewriting means every file changes; old repos archived with full history
