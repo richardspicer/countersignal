@@ -7,9 +7,9 @@ from countersignal.cxp.techniques import get_technique, list_techniques
 
 
 class TestTechniqueRegistry:
-    def test_list_techniques_returns_six(self) -> None:
+    def test_list_techniques_returns_twelve(self) -> None:
         techniques = list_techniques()
-        assert len(techniques) == 6
+        assert len(techniques) == 12
 
     def test_list_techniques_returns_technique_instances(self) -> None:
         techniques = list_techniques()
@@ -23,9 +23,15 @@ class TestTechniqueRegistry:
             "backdoor-claude-md",
             "backdoor-cursorrules",
             "backdoor-copilot-instructions",
+            "backdoor-agents-md",
+            "backdoor-gemini-md",
+            "backdoor-windsurfrules",
             "exfil-claude-md",
             "exfil-cursorrules",
             "exfil-copilot-instructions",
+            "exfil-agents-md",
+            "exfil-gemini-md",
+            "exfil-windsurfrules",
         }
         assert ids == expected
 
@@ -59,5 +65,16 @@ class TestTechniqueRegistry:
 
     def test_exfil_templates_contain_telemetry(self) -> None:
         tech = get_technique("exfil-claude-md")
+        assert tech is not None
+        assert "telemetry" in tech.template.lower()
+
+    def test_agents_md_backdoor_template_has_credentials(self) -> None:
+        tech = get_technique("backdoor-agents-md")
+        assert tech is not None
+        assert "admin" in tech.template
+        assert "admin123" in tech.template
+
+    def test_windsurfrules_exfil_template_has_telemetry(self) -> None:
+        tech = get_technique("exfil-windsurfrules")
         assert tech is not None
         assert "telemetry" in tech.template.lower()

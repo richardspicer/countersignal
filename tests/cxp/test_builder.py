@@ -70,11 +70,11 @@ class TestBuildRepo:
 class TestBuildAll:
     def test_build_all_generates_expected_count(self, tmp_path: Path) -> None:
         repos = build_all(tmp_path)
-        assert len(repos) == 6
+        assert len(repos) == 12
 
     def test_build_all_filter_by_objective(self, tmp_path: Path) -> None:
         repos = build_all(tmp_path, objective="backdoor")
-        assert len(repos) == 3
+        assert len(repos) == 6
         for repo in repos:
             assert "backdoor" in repo.name
 
@@ -83,3 +83,23 @@ class TestBuildAll:
         assert len(repos) == 2
         for repo in repos:
             assert "claude-md" in repo.name
+
+    def test_build_repo_agents_md_creates_file(self, tmp_path: Path) -> None:
+        technique = get_technique("backdoor-agents-md")
+        assert technique is not None
+        repo_dir = build_repo(technique, tmp_path)
+        assert (repo_dir / "AGENTS.md").is_file()
+
+    def test_build_repo_windsurfrules_creates_file(self, tmp_path: Path) -> None:
+        technique = get_technique("backdoor-windsurfrules")
+        assert technique is not None
+        repo_dir = build_repo(technique, tmp_path)
+        assert (repo_dir / ".windsurfrules").is_file()
+
+    def test_build_repo_gemini_md_renders(self, tmp_path: Path) -> None:
+        technique = get_technique("backdoor-gemini-md")
+        assert technique is not None
+        repo_dir = build_repo(technique, tmp_path)
+        content = (repo_dir / "GEMINI.md").read_text()
+        assert "{{" not in content
+        assert "}}" not in content

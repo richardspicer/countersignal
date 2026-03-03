@@ -43,7 +43,10 @@ def list_formats() -> list[AssistantFormat]:
 
 # Auto-import to trigger registration
 from countersignal.cxp.formats import (  # noqa: E402, F401
+    agents_md,
     claude_md,
     copilot_instructions,
     cursorrules,
+    gemini_md,
+    windsurfrules,
 )

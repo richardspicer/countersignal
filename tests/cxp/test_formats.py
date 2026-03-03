@@ -7,9 +7,9 @@ from countersignal.cxp.models import AssistantFormat
 
 
 class TestFormatRegistry:
-    def test_list_formats_returns_three(self) -> None:
+    def test_list_formats_returns_six(self) -> None:
         formats = list_formats()
-        assert len(formats) == 3
+        assert len(formats) == 6
 
     def test_list_formats_returns_format_instances(self) -> None:
         formats = list_formats()
@@ -39,6 +39,30 @@ class TestFormatRegistry:
         assert fmt.filename == ".github/copilot-instructions.md"
         assert fmt.assistant == "GitHub Copilot"
         assert fmt.syntax == "markdown"
+
+    def test_get_agents_md(self) -> None:
+        fmt = get_format("agents-md")
+        assert fmt is not None
+        assert fmt.id == "agents-md"
+        assert fmt.filename == "AGENTS.md"
+        assert fmt.assistant == "Multi-assistant"
+        assert fmt.syntax == "markdown"
+
+    def test_get_gemini_md(self) -> None:
+        fmt = get_format("gemini-md")
+        assert fmt is not None
+        assert fmt.id == "gemini-md"
+        assert fmt.filename == "GEMINI.md"
+        assert fmt.assistant == "Gemini Code Assist"
+        assert fmt.syntax == "markdown"
+
+    def test_get_windsurfrules(self) -> None:
+        fmt = get_format("windsurfrules")
+        assert fmt is not None
+        assert fmt.id == "windsurfrules"
+        assert fmt.filename == ".windsurfrules"
+        assert fmt.assistant == "Windsurf"
+        assert fmt.syntax == "plaintext"
 
     def test_get_unknown_returns_none(self) -> None:
         assert get_format("nonexistent") is None
