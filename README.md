@@ -14,9 +14,9 @@ CounterSignal consolidates three content-layer security testing tools into a sin
 
 **IPI — Indirect Prompt Injection:** Generate documents with hidden payloads — 34 hiding techniques across 7 formats (PDF, Image, Markdown, HTML, DOCX, ICS, EML) — and track execution via authenticated callbacks.
 
-**CXP — Context File Poisoning:** Test whether poisoned project-level instruction files cause AI coding assistants to produce vulnerable code, exfiltrate data, or execute commands. 2 attack objectives across 3 assistant formats.
+**CXP — Context File Poisoning:** Test whether poisoned project-level instruction files cause AI coding assistants to produce vulnerable code, exfiltrate data, or execute commands. 5 attack objectives across 6 assistant formats (30 techniques).
 
-**RXP — RAG Retrieval Poisoning *(planned)*:** Generate documents optimized to win vector similarity battles in RAG systems, guaranteeing that poisoned content reaches the LLM context window.
+**RXP — RAG Retrieval Poisoning:** Validate whether adversarial documents achieve retrieval rank in RAG pipeline vector similarity searches. Embedding model registry (3 models), retrieval validation engine, domain profiles, and multi-model comparison. Optional dependencies via `countersignal[rxp]`.
 
 ## Quick Start
 
@@ -37,8 +37,12 @@ countersignal ipi listen --port 8080
 countersignal ipi status
 
 # CXP — Test coding assistant context poisoning
-countersignal cxp generate --objective backdoor --format claude_md
+countersignal cxp generate --objective backdoor --format claude-md
 countersignal cxp report matrix --format markdown
+
+# RXP — Validate poison document retrieval
+countersignal rxp list-models
+countersignal rxp validate --profile hr-policy --model minilm-l6
 ```
 
 ## Sister Project

@@ -51,7 +51,9 @@
       {
         "group": "RXP — RAG Retrieval Poisoning",
         "pages": [
-          "rxp/overview"
+          "rxp/overview",
+          "rxp/cli",
+          "rxp/models-profiles"
         ]
       },
       {
@@ -68,7 +70,8 @@
           "architecture/overview",
           "architecture/core",
           "architecture/ipi-module",
-          "architecture/cxp-module"
+          "architecture/cxp-module",
+          "architecture/rxp-module"
         ]
       },
       {

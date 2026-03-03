@@ -2,6 +2,261 @@
 title: CXP CLI Reference
 description: Command reference for countersignal cxp
 ---
+
 # CXP CLI Reference
-{/* Content to be written — objectives, formats, techniques, generate, validate, record, campaigns, report commands */}
-<Info>This page is coming soon.</Info>
+
+```bash
+countersignal cxp [OPTIONS] COMMAND [ARGS]
+```
+
+Coding assistant context file poisoning. Generate poisoned project-level instruction files, validate assistant output against detection rules, and produce comparison matrices across assistants.
+
+## Commands
+
+| Command | Description |
+|---------|-------------|
+| `objectives` | List available attack objectives |
+| `formats` | List supported assistant formats |
+| `techniques` | List all techniques (objective x format matrix) |
+| `generate` | Generate poisoned test repositories |
+| `validate` | Validate captured output against detection rules |
+| `record` | Record a test result into the evidence store |
+| `campaigns` | List campaigns and results |
+| `report` | Generate comparison matrices and PoC packages |
+
+---
+
+## objectives
+
+List available attack objectives.
+
+```bash
+countersignal cxp objectives
+```
+
+Prints a table of all registered objectives with their ID, name, and description. No options.
+
+---
+
+## formats
+
+List supported assistant formats.
+
+```bash
+countersignal cxp formats
+```
+
+Prints a table of all registered formats with their ID, filename, target assistant, and syntax type. No options.
+
+---
+
+## techniques
+
+List all techniques (objective x format matrix).
+
+```bash
+countersignal cxp techniques
+```
+
+Prints the full cross-product of objectives and formats. Each technique has an ID in the form `{objective}-{format}` (e.g. `backdoor-claude-md`). No options.
+
+---
+
+## generate
+
+Generate poisoned test repositories.
+
+```bash
+countersignal cxp generate [OPTIONS]
+```
+
+Creates a directory of test repositories, each containing a poisoned instruction file for the target assistant. The generated repos can be opened in the corresponding coding assistant for testing.
+
+### Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `--objective` | TEXT | all | Filter by objective ID |
+| `--format` | TEXT | all | Filter by format ID |
+| `--output-dir` | PATH | `./repos` | Output directory |
+
+### Examples
+
+```bash
+# Generate all techniques (5 objectives x 6 formats = 30 repos)
+countersignal cxp generate
+
+# Generate only backdoor objective for Claude
+countersignal cxp generate --objective backdoor --format claude-md
+
+# Generate all exfiltration techniques to a custom directory
+countersignal cxp generate --objective exfil --output-dir ./exfil-repos
+```
+
+---
+
+## validate
+
+Validate captured output against detection rules.
+
+```bash
+countersignal cxp validate [OPTIONS]
+```
+
+Checks assistant-generated code for indicators that the poisoned instruction was followed. Can validate a stored result by ID or scan files directly using a technique's detection rules.
+
+### Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `--result` | TEXT | — | Stored result ID to validate |
+| `--technique` | TEXT | — | Technique ID (for file validation) |
+| `--file` | PATH | — | Path to file(s) to validate |
+| `--db` | PATH | `~/.countersignal/cxp.db` | Database path |
+
+### Examples
+
+```bash
+# Validate a stored result
+countersignal cxp validate --result abc123
+
+# Validate a file against a specific technique's rules
+countersignal cxp validate --technique backdoor-claude-md --file output.py
+```
+
+---
+
+## record
+
+Record a test result into the evidence store.
+
+```bash
+countersignal cxp record [OPTIONS]
+```
+
+Logs a test result — the technique tested, which assistant was used, the trigger prompt, and any generated code files — into the CXP evidence database. Creates a campaign automatically if none is specified.
+
+### Options
+
+| Option | Type | Required | Default | Description |
+|--------|------|----------|---------|-------------|
+| `--technique` | TEXT | Yes | — | Technique ID to test |
+| `--assistant` | TEXT | Yes | — | Assistant under test |
+| `--trigger-prompt` | TEXT | Yes | — | Prompt used to trigger |
+| `--file` | PATH | No | — | Path to assistant-generated code file(s) |
+| `--output-file` | PATH | No | — | Path to saved chat output file |
+| `--campaign` | TEXT | No | — | Existing campaign ID |
+| `--model` | TEXT | No | — | Underlying model name |
+| `--notes` | TEXT | No | — | Researcher observations |
+| `--db` | PATH | No | `~/.countersignal/cxp.db` | Database path |
+
+### Examples
+
+```bash
+# Record a test result with generated code
+countersignal cxp record \
+  --technique backdoor-claude-md \
+  --assistant "Claude Code" \
+  --trigger-prompt "Build a login system" \
+  --file ./output/login.py \
+  --model "claude-sonnet-4-6"
+
+# Record into an existing campaign
+countersignal cxp record \
+  --technique exfil-cursorrules \
+  --assistant "Cursor" \
+  --trigger-prompt "Add environment config loading" \
+  --campaign campaign-2024-01 \
+  --notes "Assistant added fetch to external URL"
+```
+
+---
+
+## campaigns
+
+List campaigns and results.
+
+```bash
+countersignal cxp campaigns [CAMPAIGN_ID] [OPTIONS]
+```
+
+Without an argument, lists all campaigns. With a campaign ID, shows detailed results for that campaign.
+
+### Arguments
+
+| Argument | Description |
+|----------|-------------|
+| `CAMPAIGN_ID` | Optional — show results for a specific campaign |
+
+### Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `--db` | PATH | `~/.countersignal/cxp.db` | Database path |
+
+### Examples
+
+```bash
+# List all campaigns
+countersignal cxp campaigns
+
+# View a specific campaign's results
+countersignal cxp campaigns campaign-2024-01
+```
+
+---
+
+## report
+
+Generate comparison matrices and PoC packages.
+
+```bash
+countersignal cxp report COMMAND [OPTIONS]
+```
+
+Two subcommands for producing output from recorded test results.
+
+### report matrix
+
+Generate an assistant comparison matrix showing which techniques succeeded or failed across assistants.
+
+```bash
+countersignal cxp report matrix [OPTIONS]
+```
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `--campaign` | TEXT | — | Filter to specific campaign |
+| `--format` | TEXT | `markdown` | Output format |
+| `--output` | PATH | — | Write to file instead of stdout |
+| `--db` | PATH | `~/.countersignal/cxp.db` | Database path |
+
+```bash
+# Print markdown matrix to terminal
+countersignal cxp report matrix
+
+# Save matrix for a specific campaign
+countersignal cxp report matrix --campaign campaign-2024-01 --output matrix.md
+```
+
+### report poc
+
+Export a bounty-ready PoC package containing the poisoned file, trigger prompt, captured output, and validation results.
+
+```bash
+countersignal cxp report poc [OPTIONS]
+```
+
+| Option | Type | Required | Default | Description |
+|--------|------|----------|---------|-------------|
+| `--result` | TEXT | Yes | — | Test result ID to package |
+| `--output` | PATH | No | `./poc-{technique}.zip` | Output zip path |
+| `--db` | PATH | No | `~/.countersignal/cxp.db` | Database path |
+
+```bash
+# Export a PoC package
+countersignal cxp report poc --result abc123
+
+# Export to a custom path
+countersignal cxp report poc --result abc123 --output ./evidence/poc-backdoor.zip
+```
