@@ -45,11 +45,11 @@ RXP solves the retrieval prerequisite: guaranteeing poisoned content wins the ve
 
 | Area | Check |
 |------|-------|
-| SAST | `bandit` + `semgrep` in CI on every PR |
-| CI Matrix | `ubuntu-latest` + `windows-latest`, Python 3.11/3.13/3.14 |
-| Dependencies | `pip-audit` + GitHub Dependabot |
+| SAST | `ruff` + `mypy` + GitHub CodeQL in CI on every PR |
+| CI Matrix | `ubuntu-latest` (Python 3.11/3.13/3.14) + `windows-latest` (Python 3.13 only) |
+| Dependencies | GitHub Dependabot |
 | Manual | Path traversal, URL validation, input sanitization, error handling |
-| Exit Criteria | Zero high/critical SAST findings, no known CVEs, SECURITY.md current |
+| Exit Criteria | Zero high/critical CodeQL findings, no known CVEs, SECURITY.md current |
 
 ## Ongoing Activities
 - **Vulnerability Research:** Multi-platform testing, responsible disclosure, abstract findings to patterns
@@ -79,7 +79,7 @@ RXP solves the retrieval prerequisite: guaranteeing poisoned content wins the ve
 
 ## Build Sequence
 
-```
+```text
 countersignal (monorepo)
 ├── core/     Shared callback infrastructure
 ├── ipi/      Indirect prompt injection detection (v0.1.0 released)
