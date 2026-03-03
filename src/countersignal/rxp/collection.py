@@ -117,4 +117,4 @@ class RetrievalCollection:
     @property
     def count(self) -> int:
         """Number of documents in the collection."""
-        return self._collection.count()
+        return int(self._collection.count())
