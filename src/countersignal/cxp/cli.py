@@ -123,7 +123,8 @@ def record(
         raw_output = "\n".join(f.read_text(encoding="utf-8", errors="replace") for f in file_list)
     else:
         capture_mode = "output"
-        assert output_file is not None
+        if output_file is None:
+            raise typer.BadParameter("--output-file is required for output capture mode")
         raw_output = output_file.read_text(encoding="utf-8", errors="replace")
 
     # Open DB and resolve campaign
