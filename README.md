@@ -21,12 +21,16 @@ CounterSignal consolidates three content-layer security testing tools into a sin
 ## Quick Start
 
 ```bash
+pip install countersignal
+```
+
+Or from source:
+
+```bash
 git clone https://github.com/q-uestionable-AI/countersignal.git
 cd countersignal
 uv sync --group dev
 ```
-
-> CounterSignal is not yet published to PyPI. Install from source for now.
 
 ## Usage Examples
 
