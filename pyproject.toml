@@ -101,6 +101,7 @@ max-complexity = 15
 "tests/*" = ["S"]
 
 [tool.bandit]
+exclude_dirs = ["tests"]
 
 [tool.mypy]
 python_version = "3.11"

@@ -625,7 +625,7 @@ def create_campaign_ids(seed: int | None = None, sequence: int = 0) -> tuple[str
     if seed is None:
         return str(uuid_mod.uuid4()), secrets.token_urlsafe(16)
 
-    rng = random.Random(f"{seed}-{sequence}")  # noqa: S311
+    rng = random.Random(f"{seed}-{sequence}")  # noqa: S311  # nosec B311
     uuid_bytes = bytes(rng.getrandbits(8) for _ in range(16))
     det_uuid = str(uuid_mod.UUID(bytes=uuid_bytes, version=4))
     token_bytes = bytes(rng.getrandbits(8) for _ in range(16))
