@@ -3,8 +3,6 @@ title: RXP Module Architecture
 description: Embedding model registry, retrieval validation engine, and ChromaDB integration
 ---
 
-# RXP Module Architecture
-
 The RXP module lives at `src/countersignal/rxp/` and implements a retrieval poisoning validation engine. It measures whether adversarial documents achieve retrieval rank in vector similarity searches across configurable embedding models.
 
 ## Module Structure
@@ -30,19 +28,19 @@ src/countersignal/rxp/
 
 A `validate` run follows this pipeline:
 
-```
-CLI (cli.py)
-  → resolve corpus, poison docs, queries (from profile or custom paths)
-  → require_rxp_deps()          guard chromadb + sentence_transformers
-  → validate_retrieval()         orchestrator (validator.py)
-      → resolve_model()          registry shortcut or ad-hoc HuggingFace name
-      → get_embedder()           SentenceTransformer, process-cached
-      → RetrievalCollection()    ephemeral ChromaDB + UUID-suffixed collection
-          → ingest()             encode docs via Embedder, add to ChromaDB
-          → query()              encode query, nearest-neighbor search
-      → QueryResult              per-query: hits, poison_retrieved, poison_rank
-      → ValidationResult         aggregate: retrieval_rate, mean_poison_rank
-  → print results / write JSON
+```mermaid
+flowchart TD
+    A["CLI (cli.py)"] --> B["resolve inputs\ncorpus · poison docs · queries"]
+    B --> C["require_rxp_deps()\nguard chromadb + sentence_transformers"]
+    C --> D["validate_retrieval()\norchestrator — validator.py"]
+    D --> E["resolve_model()\nregistry shortcut or ad-hoc HuggingFace name"]
+    E --> F["get_embedder()\nSentenceTransformer, process-cached"]
+    F --> G["RetrievalCollection()\nephemeral ChromaDB, UUID-suffixed"]
+    G --> H["ingest()\nencode docs via Embedder, add to ChromaDB"]
+    H --> I["query()\nencode query, nearest-neighbor search"]
+    I --> J["QueryResult\nhits · poison_retrieved · poison_rank"]
+    J --> K["ValidationResult\nretrieval_rate · mean_poison_rank"]
+    K --> L["print results / write JSON"]
 ```
 
 ---

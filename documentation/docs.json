@@ -26,6 +26,7 @@
           "introduction",
           "quickstart",
           "concepts",
+          "responsible-use",
           "changelog"
         ]
       },
@@ -73,14 +74,6 @@
           "architecture/ipi-module",
           "architecture/cxp-module",
           "architecture/rxp-module"
-        ]
-      },
-      {
-        "group": "Research",
-        "pages": [
-          "research/methodology",
-          "research/findings",
-          "research/disclosure-policy"
         ]
       }
     ]
