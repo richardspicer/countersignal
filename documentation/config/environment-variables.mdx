@@ -2,6 +2,41 @@
 title: Environment Variables
 description: Environment variables for CounterSignal configuration
 ---
-# Environment Variables
-{/* Content to be written — env var reference, database paths, listener defaults, CI/CD configuration */}
-<Info>This page is coming soon.</Info>
+
+CounterSignal is designed to run without external configuration. It uses a local SQLite database, generates payloads locally, and runs a self-hosted callback listener. **No environment variables are required for core functionality.**
+
+---
+
+## Configuration Approach
+
+All configuration is handled through CLI flags rather than environment variables:
+
+| Setting | How to Configure |
+|---------|-----------------|
+| Listener host | `countersignal ipi listen --host 0.0.0.0` |
+| Listener port | `countersignal ipi listen --port 9090` |
+| Output directory | `countersignal ipi generate --output ./payloads` |
+| Database path | Default: `~/.countersignal/ipi.db` (IPI) and `~/.countersignal/cxp.db` (CXP) |
+
+---
+
+## Database Locations
+
+CounterSignal stores data in `~/.countersignal/`:
+
+| Database | Module | Path |
+|----------|--------|------|
+| `ipi.db` | IPI (Indirect Prompt Injection) | `~/.countersignal/ipi.db` |
+| `cxp.db` | CXP (Context File Poisoning) | `~/.countersignal/cxp.db` |
+
+The `~/.countersignal/` directory is created automatically on first run. There is no environment variable to override these paths in the current version.
+
+---
+
+## No API Keys Required
+
+CounterSignal does not call external APIs and does not require API keys, tokens, or cloud credentials. All payload generation happens locally, and the callback listener is self-hosted.
+
+<Note>
+RXP (RAG Retrieval Poisoning) uses local embedding models via `sentence-transformers`. These models are downloaded from HuggingFace on first use — no API key is needed, but internet access is required for the initial model download.
+</Note>

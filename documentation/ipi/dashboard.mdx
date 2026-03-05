@@ -2,6 +2,92 @@
 title: Web Dashboard
 description: HTMX campaign monitoring dashboard
 ---
-# Web Dashboard
-{/* Content to be written — dashboard overview, campaign view, hit feed, generate form, reset functionality */}
-<Info>This page is coming soon.</Info>
+
+The IPI web dashboard provides a browser-based interface for monitoring campaigns, viewing callback hits, and generating payloads. It is served automatically by the callback listener.
+
+---
+
+## Starting the Dashboard
+
+The dashboard starts alongside the callback listener:
+
+```bash
+countersignal ipi listen --port 8080
+```
+
+Once running, open `http://localhost:8080/ui/` in your browser.
+
+The dashboard uses HTMX for dynamic updates — pages refresh content by polling API endpoints without requiring a full page reload.
+
+---
+
+## Dashboard Overview
+
+The main dashboard page (`/ui/`) provides a summary view of listener activity.
+
+---
+
+## Campaign List
+
+The campaigns page (`/ui/campaigns`) shows all registered campaigns with:
+
+- Campaign UUID
+- Filename and format
+- Technique and payload style
+- Hit count per campaign
+- Creation timestamp
+
+Click a campaign UUID to drill into its detail view.
+
+---
+
+## Campaign Detail View
+
+The campaign detail page (`/ui/campaigns/<uuid>`) shows full information for a single campaign, including all recorded hits with:
+
+- Timestamp
+- Confidence level (HIGH / MEDIUM / LOW)
+- Source IP
+- User-Agent string
+- Token validity
+- Captured data (query string or POST body, URL-decoded)
+
+<Note>
+Campaign drill-down from UUID links is a known work-in-progress. The detail view route exists and displays data, but some UI refinements for full hit detail display are tracked as a backlog item.
+</Note>
+
+---
+
+## Hit Feed
+
+The hits page (`/ui/hits`) shows a live-updating feed of incoming callbacks across all campaigns. New hits appear as the listener receives them, with confidence level, source IP, and timestamp displayed for each.
+
+---
+
+## Generate Form
+
+The generate page (`/ui/generate`) provides a web UI for generating payloads without the CLI. The form mirrors the `ipi generate` command options:
+
+- **Format** — Select from all supported document formats (PDF, Image, Markdown, HTML, DOCX, ICS, EML)
+- **Technique** — Populated based on the selected format
+- **Payload Style** — All 7 styles (obvious, citation, reviewer, helpful, academic, compliance, datasource)
+- **Payload Type** — All 7 types (callback through persistence)
+- **Callback URL** — The listener URL to embed in payloads
+
+---
+
+## Reset
+
+Campaign data can be cleared using the CLI:
+
+```bash
+# Reset with confirmation prompt
+countersignal ipi reset
+
+# Reset without confirmation
+countersignal ipi reset --yes
+```
+
+<Warning>
+Resetting permanently deletes all campaign records, hit data, and generated payload files. This cannot be undone.
+</Warning>
