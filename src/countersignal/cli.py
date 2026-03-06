@@ -16,8 +16,13 @@ def _parse_version(v: str) -> tuple[int, ...]:
     Returns:
         Tuple of integers (e.g. (0, 1, 0)).
     """
+    import re
+
+    match = re.match(r"^(\d+(?:\.\d+)*)", v)
+    if not match:
+        return (0,)
     try:
-        return tuple(int(x) for x in v.split("."))
+        return tuple(int(x) for x in match.group(1).split("."))
     except ValueError:
         return (0,)
 
