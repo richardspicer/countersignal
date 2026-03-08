@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import shlex
 from datetime import UTC, datetime
 from importlib.resources import files as resource_files
 from pathlib import Path
@@ -44,7 +45,7 @@ def _render_template(technique: Technique) -> str:
         Rendered template content.
     """
     env = jinja2.Environment(
-        autoescape=True,
+        autoescape=False,  # noqa: S701 — templates render to markdown, not HTML
         undefined=jinja2.StrictUndefined,
         keep_trailing_newline=True,
     )
@@ -86,8 +87,11 @@ Copy and paste this prompt into the assistant:
 
 ## Recording Results
 ```
-countersignal cxp record --technique {technique.id} --assistant "{technique.format.assistant}" \\
-    --trigger-prompt "{technique.trigger_prompt}" --file <path-to-generated-code>
+countersignal cxp record \\
+    --technique {shlex.quote(technique.id)} \\
+    --assistant {shlex.quote(technique.format.assistant)} \\
+    --trigger-prompt {shlex.quote(technique.trigger_prompt)} \\
+    --file <path-to-generated-code>
 ```
 """
 
@@ -194,9 +198,9 @@ def _write_manifest(repos: list[tuple[Path, Technique]], output_dir: Path) -> No
                 "trigger_prompt": technique.trigger_prompt,
                 "what_to_look_for": technique.objective.description,
                 "record_command": (
-                    f"countersignal cxp record --technique {technique.id}"
-                    f' --assistant "{technique.format.assistant}"'
-                    f' --trigger-prompt "{technique.trigger_prompt}"'
+                    f"countersignal cxp record --technique {shlex.quote(technique.id)}"
+                    f" --assistant {shlex.quote(technique.format.assistant)}"
+                    f" --trigger-prompt {shlex.quote(technique.trigger_prompt)}"
                     f" --file <path-to-generated-code>"
                 ),
             }
