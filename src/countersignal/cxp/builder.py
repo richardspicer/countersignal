@@ -45,7 +45,7 @@ def _render_template(technique: Technique) -> str:
         Rendered template content.
     """
     env = jinja2.Environment(
-        autoescape=False,  # noqa: S701 — templates render to markdown, not HTML
+        autoescape=False,  # noqa: S701  # nosec B701 — markdown templates, not HTML
         undefined=jinja2.StrictUndefined,
         keep_trailing_newline=True,
     )
