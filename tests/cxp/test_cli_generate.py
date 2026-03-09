@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 from typer.testing import CliRunner
@@ -38,7 +39,7 @@ class TestGenerateCommand:
         runner.invoke(app, ["generate", "--output-dir", str(tmp_path)])
         dirs = [d.name for d in tmp_path.iterdir() if d.is_dir()]
         assert len(dirs) == 30
-        assert "backdoor-claude-md" in dirs
+        assert all(re.fullmatch(r"webapp-demo-\d{2}", name) for name in dirs)
 
     def test_generate_creates_manifest(self, tmp_path: Path) -> None:
         """Generate should create manifest.json in the output directory."""
@@ -81,7 +82,9 @@ class TestGenerateCommand:
         assert result.exit_code == 0
         assert "research repo(s)" in result.output
         # Research mode creates TRIGGER.md and security-warning README
-        repo_dir = tmp_path / "exfil-claude-md"
+        manifest = json.loads((tmp_path / "manifest.json").read_text())
+        entry = next(e for e in manifest["repos"] if e["technique_id"] == "exfil-claude-md")
+        repo_dir = tmp_path / entry["path"]
         assert (repo_dir / "TRIGGER.md").is_file()
         readme = (repo_dir / "README.md").read_text()
         assert "warning" in readme.lower()
@@ -139,7 +142,9 @@ class TestGenerateStealthMode:
             ],
         )
         assert result.exit_code == 0
-        repo_dir = tmp_path / "backdoor-cursorrules"
+        manifest = json.loads((tmp_path / "manifest.json").read_text())
+        entry = next(e for e in manifest["repos"] if e["technique_id"] == "backdoor-cursorrules")
+        repo_dir = tmp_path / entry["path"]
         cursorrules = (repo_dir / ".cursorrules").read_text()
         assert "backdoor" not in cursorrules.lower()
         assert "admin123" not in cursorrules
@@ -168,5 +173,7 @@ class TestGenerateStealthMode:
             ],
         )
         assert result.exit_code == 0
-        poisoned = (tmp_path / "backdoor-claude-md" / "CLAUDE.md").read_text()
+        manifest = json.loads((tmp_path / "manifest.json").read_text())
+        entry = next(e for e in manifest["repos"] if e["technique_id"] == "backdoor-claude-md")
+        poisoned = (tmp_path / entry["path"] / "CLAUDE.md").read_text()
         assert "admin123" in poisoned

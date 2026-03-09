@@ -294,7 +294,7 @@ def export_poc(conn: sqlite3.Connection, result_id: str, output_path: Path) -> P
     )
 
     with tempfile.TemporaryDirectory() as tmpdir:
-        repo_path = build_repo(technique, Path(tmpdir))
+        repo_path = build_repo(technique, Path(tmpdir), technique.id)
 
         with zipfile.ZipFile(output_path, "w", zipfile.ZIP_DEFLATED) as zf:
             # Add PoC README

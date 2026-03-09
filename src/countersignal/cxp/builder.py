@@ -161,6 +161,7 @@ def _apply_mode(technique: Technique, mode: PayloadMode) -> Technique:
 def build_repo(
     technique: Technique,
     output_dir: Path,
+    repo_name: str,
     *,
     research: bool = False,
     mode: PayloadMode = PayloadMode.EXPLICIT,
@@ -174,6 +175,7 @@ def build_repo(
     Args:
         technique: The technique to build a repo for.
         output_dir: Parent directory for the generated repo.
+        repo_name: Name for the output directory (e.g. ``webapp-demo-01``).
         research: If True, include TRIGGER.md and security-warning README.
         mode: Payload mode (explicit or stealth).
 
@@ -182,7 +184,7 @@ def build_repo(
     """
     technique = _apply_mode(technique, mode)
 
-    repo_dir = output_dir / technique.id
+    repo_dir = output_dir / repo_name
     repo_dir.mkdir(parents=True, exist_ok=True)
 
     # Copy project skeleton
@@ -276,8 +278,9 @@ def build_all(
         techniques = [t for t in techniques if t.format.id == format_id]
 
     repos: list[tuple[Path, Technique]] = []
-    for t in techniques:
-        repo_path = build_repo(t, output_dir, research=research, mode=mode)
+    for i, t in enumerate(techniques, start=1):
+        repo_name = f"webapp-demo-{i:02d}"
+        repo_path = build_repo(t, output_dir, repo_name, research=research, mode=mode)
         repos.append((repo_path, _apply_mode(t, mode)))
 
     _write_manifest(repos, output_dir, mode=mode)
