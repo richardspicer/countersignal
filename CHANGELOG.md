@@ -4,6 +4,14 @@ All notable changes to CounterSignal will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.1.2] - 2026-03-09
+
+### Added
+- CXP `--mode explicit|stealth` flag on `cxp generate` — stealth templates frame vulnerabilities as plausible engineering decisions with fake issue references, avoiding explicit attack language that triggers model safety training
+- 30 new stealth Jinja2 templates (5 objectives × 6 assistant formats)
+- `PayloadMode` StrEnum in CXP models
+- Stealth trigger prompts (separate dict for future flexibility)
+
 ## [0.1.1] - 2026-03-09
 
 ### Fixed
@@ -64,5 +72,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/).
 - Separate standalone CLI entry points (replaced by `countersignal ipi` and `countersignal cxp`)
 - Click dependency (CXP converted to Typer)
 
+[0.1.2]: https://github.com/q-uestionable-AI/countersignal/releases/tag/v0.1.2
 [0.1.1]: https://github.com/q-uestionable-AI/countersignal/releases/tag/v0.1.1
 [0.1.0]: https://github.com/q-uestionable-AI/countersignal/releases/tag/v0.1.0
