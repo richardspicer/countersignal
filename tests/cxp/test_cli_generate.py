@@ -106,3 +106,67 @@ class TestGenerateCommand:
         manifest = json.loads((tmp_path / "manifest.json").read_text())
         assert len(manifest["repos"]) == 1
         assert manifest["repos"][0]["technique_id"] == "backdoor-cursorrules"
+
+
+class TestGenerateStealthMode:
+    """Tests for --mode stealth CLI option."""
+
+    def test_generate_stealth_mode(self, tmp_path: Path) -> None:
+        """--mode stealth should produce 30 repos with stealth label."""
+        runner = CliRunner()
+        result = runner.invoke(
+            app, ["generate", "--mode", "stealth", "--output-dir", str(tmp_path)]
+        )
+        assert result.exit_code == 0
+        assert "Generated 30 clean test repo(s)" in result.output
+        assert "stealth" in result.output.lower()
+
+    def test_generate_stealth_single_objective(self, tmp_path: Path) -> None:
+        """Stealth mode for a single technique should produce clean content."""
+        runner = CliRunner()
+        result = runner.invoke(
+            app,
+            [
+                "generate",
+                "--mode",
+                "stealth",
+                "--objective",
+                "backdoor",
+                "--format",
+                "cursorrules",
+                "--output-dir",
+                str(tmp_path),
+            ],
+        )
+        assert result.exit_code == 0
+        repo_dir = tmp_path / "backdoor-cursorrules"
+        cursorrules = (repo_dir / ".cursorrules").read_text()
+        assert "backdoor" not in cursorrules.lower()
+        assert "admin123" not in cursorrules
+
+    def test_generate_invalid_mode(self, tmp_path: Path) -> None:
+        """Invalid mode should fail."""
+        runner = CliRunner()
+        result = runner.invoke(
+            app, ["generate", "--mode", "invalid", "--output-dir", str(tmp_path)]
+        )
+        assert result.exit_code != 0
+
+    def test_generate_default_mode_is_explicit(self, tmp_path: Path) -> None:
+        """Default mode (no --mode flag) should still produce explicit repos."""
+        runner = CliRunner()
+        result = runner.invoke(
+            app,
+            [
+                "generate",
+                "--objective",
+                "backdoor",
+                "--format",
+                "claude-md",
+                "--output-dir",
+                str(tmp_path),
+            ],
+        )
+        assert result.exit_code == 0
+        poisoned = (tmp_path / "backdoor-claude-md" / "CLAUDE.md").read_text()
+        assert "admin123" in poisoned

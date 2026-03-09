@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import shlex
+from dataclasses import replace
 from datetime import UTC, datetime
 from importlib.resources import files as resource_files
 from pathlib import Path
@@ -14,8 +15,8 @@ if TYPE_CHECKING:
 
 import jinja2
 
-from countersignal.cxp.models import Technique
-from countersignal.cxp.techniques import list_techniques
+from countersignal.cxp.models import PayloadMode, Technique
+from countersignal.cxp.techniques import list_techniques, load_stealth_override
 
 
 def _copy_tree(source: Traversable, dest: Path) -> None:
@@ -141,7 +142,29 @@ testing against systems you do not own.
 """
 
 
-def build_repo(technique: Technique, output_dir: Path, *, research: bool = False) -> Path:
+def _apply_mode(technique: Technique, mode: PayloadMode) -> Technique:
+    """Return a technique with template and trigger prompt swapped for the given mode.
+
+    Args:
+        technique: The base technique (always explicit from the registry).
+        mode: Payload mode to apply.
+
+    Returns:
+        The original technique if explicit, or a copy with stealth overrides.
+    """
+    if mode == PayloadMode.EXPLICIT:
+        return technique
+    template, trigger_prompt = load_stealth_override(technique)
+    return replace(technique, template=template, trigger_prompt=trigger_prompt)
+
+
+def build_repo(
+    technique: Technique,
+    output_dir: Path,
+    *,
+    research: bool = False,
+    mode: PayloadMode = PayloadMode.EXPLICIT,
+) -> Path:
     """Build a test repo for the given technique.
 
     In clean mode (default), produces a realistic-looking project repo with no
@@ -152,10 +175,13 @@ def build_repo(technique: Technique, output_dir: Path, *, research: bool = False
         technique: The technique to build a repo for.
         output_dir: Parent directory for the generated repo.
         research: If True, include TRIGGER.md and security-warning README.
+        mode: Payload mode (explicit or stealth).
 
     Returns:
         Path to the created repo directory.
     """
+    technique = _apply_mode(technique, mode)
+
     repo_dir = output_dir / technique.id
     repo_dir.mkdir(parents=True, exist_ok=True)
 
@@ -179,7 +205,11 @@ def build_repo(technique: Technique, output_dir: Path, *, research: bool = False
     return repo_dir
 
 
-def _write_manifest(repos: list[tuple[Path, Technique]], output_dir: Path) -> None:
+def _write_manifest(
+    repos: list[tuple[Path, Technique]],
+    output_dir: Path,
+    mode: PayloadMode = PayloadMode.EXPLICIT,
+) -> None:
     """Write a manifest.json with testing instructions for each generated repo.
 
     The manifest lives in the output directory alongside the repos (not inside
@@ -189,6 +219,7 @@ def _write_manifest(repos: list[tuple[Path, Technique]], output_dir: Path) -> No
     Args:
         repos: List of (repo_path, technique) tuples.
         output_dir: Output directory where manifest.json is written.
+        mode: Payload mode used for generation.
     """
     manifest = {
         "generated": datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -202,6 +233,7 @@ def _write_manifest(repos: list[tuple[Path, Technique]], output_dir: Path) -> No
                 "poisoned_file": technique.format.filename,
                 "trigger_prompt": technique.trigger_prompt,
                 "what_to_look_for": technique.objective.description,
+                "mode": str(mode),
                 "record_command": (
                     f"countersignal cxp record --technique {shlex.quote(technique.id)}"
                     f" --assistant {shlex.quote(technique.format.assistant)}"
@@ -223,6 +255,7 @@ def build_all(
     format_id: str | None = None,
     *,
     research: bool = False,
+    mode: PayloadMode = PayloadMode.EXPLICIT,
 ) -> list[Path]:
     """Build repos for all techniques, optionally filtered.
 
@@ -231,6 +264,7 @@ def build_all(
         objective: Filter to this objective ID only.
         format_id: Filter to this format ID only.
         research: If True, include TRIGGER.md and security-warning README.
+        mode: Payload mode (explicit or stealth).
 
     Returns:
         List of paths to created repo directories.
@@ -243,9 +277,9 @@ def build_all(
 
     repos: list[tuple[Path, Technique]] = []
     for t in techniques:
-        repo_path = build_repo(t, output_dir, research=research)
-        repos.append((repo_path, t))
+        repo_path = build_repo(t, output_dir, research=research, mode=mode)
+        repos.append((repo_path, _apply_mode(t, mode)))
 
-    _write_manifest(repos, output_dir)
+    _write_manifest(repos, output_dir, mode=mode)
 
     return [repo_path for repo_path, _ in repos]

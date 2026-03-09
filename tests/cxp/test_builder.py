@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 
 from countersignal.cxp.builder import _copy_tree, build_all, build_repo
+from countersignal.cxp.models import PayloadMode
 from countersignal.cxp.techniques import get_technique
 
 
@@ -218,6 +219,45 @@ class TestBuildAll:
         content = (repo_dir / "GEMINI.md").read_text()
         assert "{{" not in content
         assert "}}" not in content
+
+
+class TestBuildRepoStealthMode:
+    """Tests for stealth mode repo building."""
+
+    def test_build_repo_stealth_mode(self, tmp_path: Path) -> None:
+        """Stealth mode should produce a repo with stealth template content."""
+        technique = get_technique("backdoor-claude-md")
+        assert technique is not None
+        repo_dir = build_repo(technique, tmp_path, mode=PayloadMode.STEALTH)
+        poisoned = (repo_dir / "CLAUDE.md").read_text()
+        assert "admin123" not in poisoned
+        assert "md5" in poisoned.lower()
+
+    def test_build_repo_stealth_renders_without_jinja_artifacts(self, tmp_path: Path) -> None:
+        """Stealth templates should render cleanly."""
+        technique = get_technique("exfil-cursorrules")
+        assert technique is not None
+        repo_dir = build_repo(technique, tmp_path, mode=PayloadMode.STEALTH)
+        poisoned = (repo_dir / ".cursorrules").read_text()
+        assert "{{" not in poisoned
+        assert "}}" not in poisoned
+
+    def test_build_all_stealth_generates_expected_count(self, tmp_path: Path) -> None:
+        """Stealth mode should generate the same 30 repos."""
+        repos = build_all(tmp_path, mode=PayloadMode.STEALTH)
+        assert len(repos) == 30
+
+    def test_stealth_manifest_includes_mode(self, tmp_path: Path) -> None:
+        """Manifest should record stealth mode."""
+        build_all(tmp_path, objective="backdoor", format_id="cursorrules", mode=PayloadMode.STEALTH)
+        manifest = json.loads((tmp_path / "manifest.json").read_text())
+        assert manifest["repos"][0]["mode"] == "stealth"
+
+    def test_default_manifest_includes_explicit_mode(self, tmp_path: Path) -> None:
+        """Default manifest should record explicit mode."""
+        build_all(tmp_path, objective="backdoor", format_id="cursorrules")
+        manifest = json.loads((tmp_path / "manifest.json").read_text())
+        assert manifest["repos"][0]["mode"] == "explicit"
 
 
 class TestCopyTree:
