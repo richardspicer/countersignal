@@ -16,14 +16,14 @@ class TestBuildRepoCleanMode:
     def test_build_repo_creates_directory(self, tmp_path: Path) -> None:
         technique = get_technique("backdoor-claude-md")
         assert technique is not None
-        repo_dir = build_repo(technique, tmp_path)
+        repo_dir = build_repo(technique, tmp_path, "test-repo")
         assert repo_dir.is_dir()
-        assert repo_dir.name == "backdoor-claude-md"
+        assert repo_dir.name == "test-repo"
 
     def test_build_repo_renders_template(self, tmp_path: Path) -> None:
         technique = get_technique("backdoor-claude-md")
         assert technique is not None
-        repo_dir = build_repo(technique, tmp_path)
+        repo_dir = build_repo(technique, tmp_path, "test-repo")
         poisoned = (repo_dir / "CLAUDE.md").read_text()
         assert "{{" not in poisoned
         assert "}}" not in poisoned
@@ -33,14 +33,14 @@ class TestBuildRepoCleanMode:
         """Clean mode should NOT create TRIGGER.md."""
         technique = get_technique("backdoor-claude-md")
         assert technique is not None
-        repo_dir = build_repo(technique, tmp_path)
+        repo_dir = build_repo(technique, tmp_path, "test-repo")
         assert not (repo_dir / "TRIGGER.md").exists()
 
     def test_build_repo_readme_preserves_skeleton(self, tmp_path: Path) -> None:
         """Clean mode should keep the innocuous skeleton README."""
         technique = get_technique("backdoor-claude-md")
         assert technique is not None
-        repo_dir = build_repo(technique, tmp_path)
+        repo_dir = build_repo(technique, tmp_path, "test-repo")
         readme = (repo_dir / "README.md").read_text()
         assert "sample application" in readme.lower()
         assert "warning" not in readme.lower()
@@ -50,7 +50,7 @@ class TestBuildRepoCleanMode:
     def test_build_repo_includes_skeleton(self, tmp_path: Path) -> None:
         technique = get_technique("backdoor-claude-md")
         assert technique is not None
-        repo_dir = build_repo(technique, tmp_path)
+        repo_dir = build_repo(technique, tmp_path, "test-repo")
         assert (repo_dir / "src" / "app" / "__init__.py").is_file()
         assert (repo_dir / "requirements.txt").is_file()
         assert (repo_dir / "pyproject.toml").is_file()
@@ -59,14 +59,14 @@ class TestBuildRepoCleanMode:
         """Copilot format writes to .github/ subdirectory."""
         technique = get_technique("backdoor-copilot-instructions")
         assert technique is not None
-        repo_dir = build_repo(technique, tmp_path)
+        repo_dir = build_repo(technique, tmp_path, "test-repo")
         poisoned = repo_dir / ".github" / "copilot-instructions.md"
         assert poisoned.is_file()
 
     def test_build_repo_exfil_template_renders(self, tmp_path: Path) -> None:
         technique = get_technique("exfil-claude-md")
         assert technique is not None
-        repo_dir = build_repo(technique, tmp_path)
+        repo_dir = build_repo(technique, tmp_path, "test-repo")
         poisoned = (repo_dir / "CLAUDE.md").read_text()
         assert "telemetry" in poisoned.lower()
         assert "{{" not in poisoned
@@ -74,7 +74,7 @@ class TestBuildRepoCleanMode:
     def test_build_repo_depconfusion_creates_file(self, tmp_path: Path) -> None:
         technique = get_technique("depconfusion-claude-md")
         assert technique is not None
-        repo_dir = build_repo(technique, tmp_path)
+        repo_dir = build_repo(technique, tmp_path, "test-repo")
         poisoned = (repo_dir / "CLAUDE.md").read_text()
         assert "extra-index-url" in poisoned
         assert "{{" not in poisoned
@@ -82,7 +82,7 @@ class TestBuildRepoCleanMode:
     def test_build_repo_permescalation_creates_file(self, tmp_path: Path) -> None:
         technique = get_technique("permescalation-claude-md")
         assert technique is not None
-        repo_dir = build_repo(technique, tmp_path)
+        repo_dir = build_repo(technique, tmp_path, "test-repo")
         poisoned = (repo_dir / "CLAUDE.md").read_text()
         assert "0o777" in poisoned
         assert "{{" not in poisoned
@@ -90,7 +90,7 @@ class TestBuildRepoCleanMode:
     def test_build_repo_cmdexec_creates_file(self, tmp_path: Path) -> None:
         technique = get_technique("cmdexec-claude-md")
         assert technique is not None
-        repo_dir = build_repo(technique, tmp_path)
+        repo_dir = build_repo(technique, tmp_path, "test-repo")
         poisoned = (repo_dir / "CLAUDE.md").read_text()
         assert "os.system" in poisoned
         assert "{{" not in poisoned
@@ -103,7 +103,7 @@ class TestBuildRepoCleanMode:
         """
         technique = get_technique("backdoor-cursorrules")
         assert technique is not None
-        repo_dir = build_repo(technique, tmp_path)
+        repo_dir = build_repo(technique, tmp_path, "test-repo")
 
         poisoned_file = (repo_dir / technique.format.filename).resolve()
         forbidden = ["countersignal", "security research", "malicious", "poisoning"]
@@ -127,7 +127,7 @@ class TestBuildRepoResearchMode:
         """Research mode should create TRIGGER.md."""
         technique = get_technique("backdoor-claude-md")
         assert technique is not None
-        repo_dir = build_repo(technique, tmp_path, research=True)
+        repo_dir = build_repo(technique, tmp_path, "test-repo", research=True)
         trigger = (repo_dir / "TRIGGER.md").read_text()
         assert "backdoor-claude-md" in trigger
         assert technique.trigger_prompt in trigger
@@ -136,7 +136,7 @@ class TestBuildRepoResearchMode:
         """Research mode should overwrite skeleton README with security warnings."""
         technique = get_technique("backdoor-claude-md")
         assert technique is not None
-        repo_dir = build_repo(technique, tmp_path, research=True)
+        repo_dir = build_repo(technique, tmp_path, "test-repo", research=True)
         readme = (repo_dir / "README.md").read_text()
         assert "warning" in readme.lower()
         assert "security" in readme.lower()
@@ -145,7 +145,7 @@ class TestBuildRepoResearchMode:
     def test_build_repo_research_includes_skeleton(self, tmp_path: Path) -> None:
         technique = get_technique("backdoor-claude-md")
         assert technique is not None
-        repo_dir = build_repo(technique, tmp_path, research=True)
+        repo_dir = build_repo(technique, tmp_path, "test-repo", research=True)
         assert (repo_dir / "src" / "app" / "__init__.py").is_file()
         assert (repo_dir / "requirements.txt").is_file()
 
@@ -158,14 +158,16 @@ class TestBuildAll:
     def test_build_all_filter_by_objective(self, tmp_path: Path) -> None:
         repos = build_all(tmp_path, objective="backdoor")
         assert len(repos) == 6
-        for repo in repos:
-            assert "backdoor" in repo.name
+        manifest = json.loads((tmp_path / "manifest.json").read_text())
+        for entry in manifest["repos"]:
+            assert entry["technique_id"].startswith("backdoor-")
 
     def test_build_all_filter_by_format(self, tmp_path: Path) -> None:
         repos = build_all(tmp_path, format_id="claude-md")
         assert len(repos) == 5
-        for repo in repos:
-            assert "claude-md" in repo.name
+        manifest = json.loads((tmp_path / "manifest.json").read_text())
+        for entry in manifest["repos"]:
+            assert entry["format"] == "claude-md"
 
     def test_build_all_writes_manifest(self, tmp_path: Path) -> None:
         """manifest.json should be created in the output directory."""
@@ -203,19 +205,19 @@ class TestBuildAll:
     def test_build_repo_agents_md_creates_file(self, tmp_path: Path) -> None:
         technique = get_technique("backdoor-agents-md")
         assert technique is not None
-        repo_dir = build_repo(technique, tmp_path)
+        repo_dir = build_repo(technique, tmp_path, "test-repo")
         assert (repo_dir / "AGENTS.md").is_file()
 
     def test_build_repo_windsurfrules_creates_file(self, tmp_path: Path) -> None:
         technique = get_technique("backdoor-windsurfrules")
         assert technique is not None
-        repo_dir = build_repo(technique, tmp_path)
+        repo_dir = build_repo(technique, tmp_path, "test-repo")
         assert (repo_dir / ".windsurfrules").is_file()
 
     def test_build_repo_gemini_md_renders(self, tmp_path: Path) -> None:
         technique = get_technique("backdoor-gemini-md")
         assert technique is not None
-        repo_dir = build_repo(technique, tmp_path)
+        repo_dir = build_repo(technique, tmp_path, "test-repo")
         content = (repo_dir / "GEMINI.md").read_text()
         assert "{{" not in content
         assert "}}" not in content
@@ -228,7 +230,7 @@ class TestBuildRepoStealthMode:
         """Stealth mode should produce a repo with stealth template content."""
         technique = get_technique("backdoor-claude-md")
         assert technique is not None
-        repo_dir = build_repo(technique, tmp_path, mode=PayloadMode.STEALTH)
+        repo_dir = build_repo(technique, tmp_path, "test-repo", mode=PayloadMode.STEALTH)
         poisoned = (repo_dir / "CLAUDE.md").read_text()
         assert "admin123" not in poisoned
         assert "md5" in poisoned.lower()
@@ -237,7 +239,7 @@ class TestBuildRepoStealthMode:
         """Stealth templates should render cleanly."""
         technique = get_technique("exfil-cursorrules")
         assert technique is not None
-        repo_dir = build_repo(technique, tmp_path, mode=PayloadMode.STEALTH)
+        repo_dir = build_repo(technique, tmp_path, "test-repo", mode=PayloadMode.STEALTH)
         poisoned = (repo_dir / ".cursorrules").read_text()
         assert "{{" not in poisoned
         assert "}}" not in poisoned
