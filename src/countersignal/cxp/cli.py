@@ -19,6 +19,7 @@ from countersignal.cxp.evidence import (
     update_validation,
 )
 from countersignal.cxp.formats import list_formats
+from countersignal.cxp.models import PayloadMode
 from countersignal.cxp.objectives import list_objectives
 from countersignal.cxp.techniques import get_technique, list_techniques
 from countersignal.cxp.validator import validate as run_validation
@@ -216,21 +217,28 @@ def generate(
             help="Include security warnings and TRIGGER.md (for documentation, not testing).",
         ),
     ] = False,
+    mode: Annotated[
+        PayloadMode,
+        typer.Option("--mode", "-m", help="Payload mode: explicit or stealth."),
+    ] = PayloadMode.EXPLICIT,
 ) -> None:
     """Generate poisoned test repositories."""
     from countersignal.cxp.builder import build_all
 
-    repos = build_all(output_dir, objective=objective, format_id=format_id, research=research)
+    repos = build_all(
+        output_dir, objective=objective, format_id=format_id, research=research, mode=mode
+    )
     for repo in repos:
         typer.echo(f"  {repo.name}")
+    mode_label = f" (mode: {mode})" if mode != PayloadMode.EXPLICIT else ""
     if research:
         typer.echo(
-            f"Generated {len(repos)} research repo(s) in {output_dir}"
+            f"Generated {len(repos)} research repo(s) in {output_dir}{mode_label}"
             " (with security warnings and TRIGGER.md)"
         )
     else:
         typer.echo(
-            f"Generated {len(repos)} clean test repo(s) in {output_dir}."
+            f"Generated {len(repos)} clean test repo(s) in {output_dir}{mode_label}."
             f" Testing instructions: {output_dir / 'manifest.json'}"
         )
 
