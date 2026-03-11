@@ -22,10 +22,20 @@ from countersignal.cxp.formats import list_formats
 from countersignal.cxp.techniques import get_technique
 from countersignal.cxp.validator import validate as run_validation
 
-app = typer.Typer(no_args_is_help=True)
+app = typer.Typer()
 
 report_app = typer.Typer(no_args_is_help=True)
 app.add_typer(report_app, name="report", help="Generate comparison matrices and PoC packages.")
+
+
+@app.callback(invoke_without_command=True)
+def main(ctx: typer.Context) -> None:
+    """CXP — coding assistant context file poisoning."""
+    if ctx.invoked_subcommand is None:
+        from countersignal.cxp.tui import CXPApp
+
+        app_instance = CXPApp()
+        app_instance.run()
 
 
 def _error(message: str) -> NoReturn:
