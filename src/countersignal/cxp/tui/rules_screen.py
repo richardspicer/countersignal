@@ -184,8 +184,8 @@ class RulesScreen(Screen):
     """
 
     BINDINGS = [
-        Binding("up", "focus_previous_rule", show=False, priority=True),
-        Binding("down", "focus_next_rule", show=False, priority=True),
+        Binding("up", "focus_previous_rule", "Move up", priority=True),
+        Binding("down", "focus_next_rule", "Move down", priority=True),
         Binding("space", "toggle_focused", "Toggle", show=True, priority=True),
         Binding("f", "freestyle", "Freestyle rule"),
         Binding("enter", "proceed", "Continue", priority=True),
@@ -208,10 +208,6 @@ class RulesScreen(Screen):
             for rule in self.app.freestyle_rules:  # type: ignore[attr-defined]
                 yield self._build_rule_checkbox(rule, selected=True)
         yield Static(id="rules-summary", classes="rules-summary")
-        yield Static(
-            "Keys: UP/DOWN move, Space toggle, Enter continue, f freestyle, q quit, Backspace back",
-            classes="screen-help",
-        )
         yield Footer()
 
     def on_mount(self) -> None:

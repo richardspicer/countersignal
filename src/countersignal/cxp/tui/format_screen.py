@@ -48,10 +48,6 @@ class FormatScreen(Screen):
             for fmt in formats
         ]
         yield OptionList(*options, id="format-list")
-        yield Static(
-            "Keys: UP/DOWN navigate, Enter select, q quit",
-            classes="screen-help",
-        )
         yield Footer()
 
     def on_mount(self) -> None:
