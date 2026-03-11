@@ -27,6 +27,7 @@ class FormatScreen(Screen):
     """
 
     BINDINGS = [
+        Binding("enter", "select_format", "Select"),
         Binding("q", "quit", "Quit"),
     ]
 
@@ -38,6 +39,10 @@ class FormatScreen(Screen):
         options = [Option(f"{fmt.filename:<35} ({fmt.assistant})", id=fmt.id) for fmt in formats]
         yield OptionList(*options, id="format-list")
         yield Footer()
+
+    def action_select_format(self) -> None:
+        """Trigger selection on the option list when Enter is pressed outside it."""
+        self.query_one("#format-list", OptionList).action_select()
 
     def on_option_list_option_selected(self, event: OptionList.OptionSelected) -> None:
         """Handle format selection."""

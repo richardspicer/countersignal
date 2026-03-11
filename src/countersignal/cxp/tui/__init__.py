@@ -81,6 +81,10 @@ class CXPApp(App):
         margin: 1 2;
         height: 1fr;
     }
+    #btn-continue {
+        margin: 1 2;
+        width: auto;
+    }
     #preview-scroll {
         margin: 1 2;
         height: 1fr;

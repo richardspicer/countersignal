@@ -37,6 +37,7 @@ class RecordScreen(Screen):
     """
 
     BINDINGS = [
+        Binding("enter", "record", "Record"),
         Binding("v", "validate_output", "Validate first"),
         Binding("escape", "cancel", "Cancel"),
     ]

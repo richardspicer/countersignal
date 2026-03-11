@@ -180,6 +180,8 @@ class RulesScreen(Screen):
     """
 
     BINDINGS = [
+        Binding("space", "toggle_focused", "Toggle", show=True),
+        Binding("tab", "focus_next", "Navigate", show=True),
         Binding("f", "freestyle", "Freestyle rule"),
         Binding("enter", "proceed", "Continue"),
         Binding("backspace", "back", "Back"),
@@ -194,6 +196,7 @@ class RulesScreen(Screen):
                 marker = _SEVERITY_MARKERS.get(rule.severity, "○")
                 yield Checkbox(
                     f" {marker} {rule.id} — {rule.name}",
+                    value=False,
                     id=f"rule-{rule.id}",
                 )
             # Show any freestyle rules already added this session
@@ -204,7 +207,16 @@ class RulesScreen(Screen):
                     value=True,
                     id=f"rule-{rule.id}",
                 )
+        yield Button("Continue", variant="primary", id="btn-continue")
         yield Footer()
+
+    def action_toggle_focused(self) -> None:
+        """No-op — Checkbox handles Space when focused. Shown in Footer only."""
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        """Handle Continue button click."""
+        if event.button.id == "btn-continue":
+            self.action_proceed()
 
     def _get_sections(self) -> list[str]:
         """Extract available section IDs from the selected format's base template."""
