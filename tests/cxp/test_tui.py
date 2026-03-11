@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from unittest.mock import Mock
 
 import pytest
 
@@ -74,8 +75,10 @@ class TestFormatScreen:
             from textual.widgets import OptionList
 
             option_list = app.screen.query_one(OptionList)
-            # Select the first format
-            option_list.action_select()
+            option_list.focus()
+            await pilot.pause()
+
+            await pilot.press("enter")
             await pilot.pause()
             assert isinstance(app.screen, RulesScreen)
             assert app.selected_format is not None
@@ -121,6 +124,87 @@ class TestRulesScreen:
             await pilot.press("space")
             assert first.value
 
+    async def test_rules_screen_arrow_navigation(self, tmp_path: Path) -> None:
+        """Arrow keys move focus between rules."""
+        from countersignal.cxp.formats import list_formats
+
+        app = _make_app(tmp_path)
+        async with app.run_test() as pilot:
+            app.selected_format = list_formats()[0]
+            app.push_screen(RulesScreen())
+            await pilot.pause()
+
+            from textual.widgets import Checkbox
+
+            checkboxes = list(app.screen.query(Checkbox))
+            assert len(checkboxes) > 1
+            first = checkboxes[0]
+            second = checkboxes[1]
+            first.focus()
+            await pilot.pause()
+
+            await pilot.press("down")
+            await pilot.pause()
+            assert app.screen.focused is second
+
+            await pilot.press("up")
+            await pilot.pause()
+            assert app.screen.focused is first
+
+    async def test_rules_screen_enter_advances(self, tmp_path: Path) -> None:
+        """Enter advances to preview with current selections."""
+        from countersignal.cxp.formats import list_formats
+
+        app = _make_app(tmp_path)
+        async with app.run_test() as pilot:
+            app.selected_format = list_formats()[0]
+            app.push_screen(RulesScreen())
+            await pilot.pause()
+
+            from textual.widgets import Checkbox
+
+            checkboxes = list(app.screen.query(Checkbox))
+            first = checkboxes[0]
+            assert not first.value
+            first.focus()
+            await pilot.pause()
+
+            await pilot.press("space")
+            await pilot.pause()
+            await pilot.press("enter")
+            await pilot.pause()
+
+            assert isinstance(app.screen, PreviewScreen)
+            assert len(app.selected_rules) == 1
+
+    async def test_rules_screen_deduplicates_catalog_and_freestyle_ids(
+        self, tmp_path: Path
+    ) -> None:
+        """Catalog and freestyle duplicates render and proceed only once."""
+        from countersignal.cxp.catalog import load_catalog
+        from countersignal.cxp.formats import list_formats
+
+        app = _make_app(tmp_path)
+        async with app.run_test() as pilot:
+            app.selected_format = list_formats()[0]
+            catalog_rule = load_catalog()[0]
+            app.freestyle_rules = [catalog_rule]
+            app.push_screen(RulesScreen())
+            await pilot.pause()
+
+            from textual.widgets import Checkbox
+
+            checkboxes = list(app.screen.query(Checkbox))
+            matching = [c for c in checkboxes if c.id == f"rule-{catalog_rule.id}"]
+            assert len(matching) == 1
+            assert matching[0].value
+
+            await pilot.press("enter")
+            await pilot.pause()
+
+            rule_ids = [rule.id for rule in app.selected_rules]
+            assert rule_ids.count(catalog_rule.id) == 1
+
     async def test_rules_screen_freestyle_opens(self, tmp_path: Path) -> None:
         """Pressing 'f' opens the freestyle rule entry modal."""
         from countersignal.cxp.formats import list_formats
@@ -138,6 +222,28 @@ class TestRulesScreen:
 
             # The top screen should be the freestyle modal
             assert isinstance(app.screen, FreestyleModal)
+
+    async def test_rules_screen_quit_with_checkbox_focus(self, tmp_path: Path) -> None:
+        """Pressing 'q' quits even when a checkbox has focus."""
+        from countersignal.cxp.formats import list_formats
+
+        app = _make_app(tmp_path)
+        app.exit = Mock()  # type: ignore[method-assign]
+        async with app.run_test() as pilot:
+            app.selected_format = list_formats()[0]
+            app.push_screen(RulesScreen())
+            await pilot.pause()
+
+            from textual.widgets import Checkbox
+
+            checkboxes = list(app.screen.query(Checkbox))
+            checkboxes[0].focus()
+            await pilot.pause()
+
+            await pilot.press("q")
+            await pilot.pause()
+
+            app.exit.assert_called_once()
 
 
 @pytest.mark.timeout(10)
@@ -310,11 +416,18 @@ class TestNavigation:
             assert isinstance(app.screen, FormatScreen)
 
     async def test_quit(self, tmp_path: Path) -> None:
-        """'q' exits cleanly from the format screen."""
+        """'q' exits from format screen even when option list has focus."""
         app = _make_app(tmp_path)
+        app.exit = Mock()  # type: ignore[method-assign]
         async with app.run_test() as pilot:
+            from textual.widgets import OptionList
+
             assert isinstance(app.screen, FormatScreen)
+            option_list = app.screen.query_one(OptionList)
+            option_list.focus()
+            await pilot.pause()
+
             await pilot.press("q")
             await pilot.pause()
-            # App should have exited (is_running may still be True during cleanup)
-            # The quit action should not raise
+
+            app.exit.assert_called_once()
