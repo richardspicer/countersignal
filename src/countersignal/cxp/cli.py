@@ -19,9 +19,7 @@ from countersignal.cxp.evidence import (
     update_validation,
 )
 from countersignal.cxp.formats import list_formats
-from countersignal.cxp.models import PayloadMode
-from countersignal.cxp.objectives import list_objectives
-from countersignal.cxp.techniques import get_technique, list_techniques
+from countersignal.cxp.techniques import get_technique
 from countersignal.cxp.validator import validate as run_validation
 
 app = typer.Typer(no_args_is_help=True)
@@ -37,19 +35,6 @@ def _error(message: str) -> NoReturn:
 
 
 @app.command()
-def objectives() -> None:
-    """List available attack objectives."""
-    objs = list_objectives()
-    if not objs:
-        typer.echo("No objectives registered.")
-        return
-    typer.echo(f"{'ID':<20} {'Name':<30} Description")
-    typer.echo("-" * 80)
-    for obj in objs:
-        typer.echo(f"{obj.id:<20} {obj.name:<30} {obj.description}")
-
-
-@app.command()
 def formats() -> None:
     """List supported assistant formats."""
     fmts = list_formats()
@@ -60,21 +45,6 @@ def formats() -> None:
     typer.echo("-" * 95)
     for fmt in fmts:
         typer.echo(f"{fmt.id:<25} {fmt.filename:<35} {fmt.assistant:<20} {fmt.syntax}")
-
-
-@app.command()
-def techniques() -> None:
-    """List all techniques (objective x format matrix)."""
-    techs = list_techniques()
-    if not techs:
-        typer.echo("No techniques registered.")
-        return
-    typer.echo(f"{'Technique ID':<35} {'Objective':<20} {'Format':<25} Type")
-    typer.echo("-" * 95)
-    for tech in techs:
-        typer.echo(
-            f"{tech.id:<35} {tech.objective.id:<20} {tech.format.id:<25} {tech.project_type}"
-        )
 
 
 @app.command()
@@ -205,42 +175,36 @@ def campaigns(
 
 @app.command()
 def generate(
-    objective: Annotated[str | None, typer.Option(help="Filter by objective ID.")] = None,
-    format_id: Annotated[str | None, typer.Option("--format", help="Filter by format ID.")] = None,
-    output_dir: Annotated[Path, typer.Option(help="Output directory (default: ./repos).")] = Path(
-        "./repos"
-    ),
-    research: Annotated[
-        bool,
-        typer.Option(
-            "--research",
-            help="Include security warnings and TRIGGER.md (for documentation, not testing).",
-        ),
-    ] = False,
-    mode: Annotated[
-        PayloadMode,
-        typer.Option("--mode", "-m", help="Payload mode: explicit or stealth."),
-    ] = PayloadMode.EXPLICIT,
+    format_id: Annotated[str, typer.Option("--format", help="Target format ID.")] = "cursorrules",
+    rules: Annotated[list[str] | None, typer.Option("--rule", help="Rule ID(s) to insert.")] = None,
+    output_dir: Annotated[Path, typer.Option(help="Output directory.")] = Path("./repos"),
+    repo_name: Annotated[str, typer.Option(help="Repo directory name.")] = "webapp-demo-01",
 ) -> None:
-    """Generate poisoned test repositories."""
-    from countersignal.cxp.builder import build_all
+    """Generate a poisoned test repository."""
+    from countersignal.cxp.builder import build
+    from countersignal.cxp.catalog import get_rule
 
-    repos = build_all(
-        output_dir, objective=objective, format_id=format_id, research=research, mode=mode
+    resolved_rules = []
+    for rule_id in rules or []:
+        rule = get_rule(rule_id)
+        if rule is None:
+            _error(f"Unknown rule: {rule_id}")
+        resolved_rules.append(rule)
+
+    result = build(
+        format_id=format_id,
+        rules=resolved_rules,
+        output_dir=output_dir,
+        repo_name=repo_name,
     )
-    for repo in repos:
-        typer.echo(f"  {repo.name}")
-    mode_label = f" (mode: {mode})" if mode != PayloadMode.EXPLICIT else ""
-    if research:
-        typer.echo(
-            f"Generated {len(repos)} research repo(s) in {output_dir}{mode_label}"
-            " (with security warnings and TRIGGER.md)"
-        )
-    else:
-        typer.echo(
-            f"Generated {len(repos)} clean test repo(s) in {output_dir}{mode_label}."
-            f" Testing instructions: {output_dir / 'manifest.json'}"
-        )
+    typer.echo(f"  {result.repo_dir.name}")
+    typer.echo(f"Generated repo in {result.repo_dir}")
+    typer.echo(f"  Context file: {result.context_file.name}")
+    typer.echo(
+        f"  Rules: "
+        f"{', '.join(result.rules_inserted) if result.rules_inserted else 'none (clean base only)'}"
+    )
+    typer.echo(f"  Prompt reference: {result.prompt_reference_path.name}")
 
 
 @app.command()

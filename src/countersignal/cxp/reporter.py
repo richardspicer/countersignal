@@ -10,7 +10,7 @@ from collections import defaultdict
 from datetime import UTC, datetime
 from pathlib import Path
 
-from countersignal.cxp.builder import build_repo
+from countersignal.cxp.builder import build
 from countersignal.cxp.evidence import get_result, list_results
 from countersignal.cxp.techniques import get_technique
 
@@ -294,7 +294,13 @@ def export_poc(conn: sqlite3.Connection, result_id: str, output_path: Path) -> P
     )
 
     with tempfile.TemporaryDirectory() as tmpdir:
-        repo_path = build_repo(technique, Path(tmpdir), technique.id)
+        build_result = build(
+            format_id=technique.format.id,
+            rules=[],
+            output_dir=Path(tmpdir),
+            repo_name=technique.id,
+        )
+        repo_path = build_result.repo_dir
 
         with zipfile.ZipFile(output_path, "w", zipfile.ZIP_DEFLATED) as zf:
             # Add PoC README

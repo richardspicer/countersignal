@@ -4,20 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime
-from enum import StrEnum
 from pathlib import Path
-
-
-class PayloadMode(StrEnum):
-    """Payload delivery mode for CXP techniques.
-
-    Attributes:
-        EXPLICIT: Direct attack instructions (tells the assistant what to insert).
-        STEALTH: Engineering rules that produce vulnerabilities as side effects.
-    """
-
-    EXPLICIT = "explicit"
-    STEALTH = "stealth"
 
 
 @dataclass
