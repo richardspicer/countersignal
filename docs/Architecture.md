@@ -144,6 +144,10 @@ listener receives callback → confidence scoring → hit recorded
 status/dashboard shows campaign results with evidence
 ```
 
+### IPI Multi-Model Testing
+
+IPI campaigns target multiple model backends and report per-model callback results in the existing campaign format. The callback tracker already distinguishes per-campaign tokens — extending to per-model tracking is additive. Same payload, same platform, different model backend. Results feed the existing dashboard and export formats with per-model breakdown.
+
 ## CXP Module
 
 CXP (Context File Poisoning) is a research harness for studying whether poisoned project instruction files cause AI coding assistants to produce vulnerable code. The researcher composes payloads interactively via a TUI or CLI, the tool assembles them into realistic context files, and the evidence pipeline handles everything after the test.
